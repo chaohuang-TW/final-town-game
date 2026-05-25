@@ -3,710 +3,746 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>期末任務小鎮</title>
+    <title>拯救方塊世界</title>
     <style>
-:root {
-  color-scheme: light;
-  --ink: #21303a;
-  --muted: #687783;
-  --paper: #fffaf0;
-  --panel: #ffffff;
-  --line: #d9e1e6;
-  --green: #4f9b63;
-  --blue: #3d7fb6;
-  --red: #d95b50;
-  --yellow: #f3b64b;
-  --teal: #4ca6a8;
-  --shadow: 0 18px 45px rgba(48, 65, 76, 0.16);
-}
-
-* {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  min-height: 100vh;
-  font-family: "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", system-ui, sans-serif;
-  color: var(--ink);
-  background:
-    linear-gradient(180deg, rgba(224, 243, 255, 0.88), rgba(255, 247, 225, 0.92)),
-    repeating-linear-gradient(90deg, rgba(79, 155, 99, 0.08) 0 32px, transparent 32px 64px);
-}
-
-button {
-  font: inherit;
-}
-
-.app-shell {
-  width: min(1180px, calc(100vw - 32px));
-  margin: 0 auto;
-  padding: 24px 0;
-}
-
-.topbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 18px;
-}
-
-.eyebrow {
-  margin: 0 0 6px;
-  color: var(--blue);
-  font-size: 0.86rem;
-  font-weight: 800;
-}
-
-h1,
-h2,
-p {
-  margin-top: 0;
-}
-
-h1 {
-  margin-bottom: 0;
-  font-size: clamp(2rem, 5vw, 3.4rem);
-}
-
-h2 {
-  margin-bottom: 12px;
-  font-size: 1.65rem;
-}
-
-.stats {
-  display: flex;
-  gap: 10px;
-}
-
-.stat {
-  min-width: 82px;
-  padding: 10px 12px;
-  border: 2px solid rgba(33, 48, 58, 0.1);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.78);
-  text-align: center;
-}
-
-.stat span {
-  display: block;
-  font-size: 1.45rem;
-  font-weight: 900;
-}
-
-.stat small {
-  color: var(--muted);
-  font-weight: 800;
-}
-
-.game-grid {
-  display: grid;
-  grid-template-columns: minmax(320px, 1.05fr) minmax(340px, 0.95fr);
-  gap: 18px;
-  align-items: stretch;
-}
-
-.town-panel,
-.play-panel {
-  min-height: 650px;
-  border: 2px solid rgba(33, 48, 58, 0.08);
-  border-radius: 8px;
-  background: var(--panel);
-  box-shadow: var(--shadow);
-  overflow: hidden;
-}
-
-.town-panel {
-  position: relative;
-  background:
-    linear-gradient(180deg, #aee2f5 0 34%, #97d47d 34% 100%);
-}
-
-.sky {
-  position: absolute;
-  inset: 0 0 auto;
-  height: 42%;
-}
-
-.cloud {
-  position: absolute;
-  width: 98px;
-  height: 34px;
-  border-radius: 30px;
-  background: rgba(255, 255, 255, 0.92);
-}
-
-.cloud::before,
-.cloud::after {
-  content: "";
-  position: absolute;
-  border-radius: 50%;
-  background: inherit;
-}
-
-.cloud::before {
-  width: 42px;
-  height: 42px;
-  left: 14px;
-  top: -18px;
-}
-
-.cloud::after {
-  width: 52px;
-  height: 52px;
-  right: 12px;
-  top: -26px;
-}
-
-.cloud-a {
-  left: 9%;
-  top: 12%;
-}
-
-.cloud-b {
-  right: 12%;
-  top: 22%;
-  transform: scale(0.78);
-}
-
-.town-map {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px;
-  height: 100%;
-  padding: 170px 28px 34px;
-}
-
-.town-path {
-  position: absolute;
-  left: 50%;
-  bottom: -28px;
-  width: 210px;
-  height: 390px;
-  border-radius: 50% 50% 0 0;
-  background: rgba(224, 190, 122, 0.76);
-  transform: translateX(-50%);
-}
-
-.building {
-  position: relative;
-  display: flex;
-  min-height: 156px;
-  padding: 14px;
-  border: 3px solid rgba(33, 48, 58, 0.15);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.82);
-  cursor: pointer;
-  transition: transform 160ms ease, filter 160ms ease, background 160ms ease;
-}
-
-.building:hover,
-.building:focus-visible {
-  transform: translateY(-3px);
-  outline: 0;
-}
-
-.building.is-locked {
-  filter: saturate(0.45);
-}
-
-.building.is-complete {
-  background: #fff8d7;
-  border-color: rgba(243, 182, 75, 0.72);
-}
-
-.building-art {
-  width: 86px;
-  min-width: 86px;
-  height: 94px;
-  align-self: flex-end;
-  border: 4px solid rgba(33, 48, 58, 0.18);
-  border-bottom-width: 8px;
-  border-radius: 8px 8px 4px 4px;
-  background: var(--unit-color);
-  box-shadow: inset 0 -18px rgba(0, 0, 0, 0.08);
-}
-
-.building-art::before {
-  content: "";
-  position: absolute;
-  width: 54px;
-  height: 28px;
-  left: 30px;
-  top: 38px;
-  border-radius: 8px 8px 0 0;
-  background: color-mix(in srgb, var(--unit-color), white 42%);
-}
-
-.building-info {
-  min-width: 0;
-  padding-left: 12px;
-}
-
-.building-info strong {
-  display: block;
-  margin-bottom: 6px;
-  font-size: 1.05rem;
-}
-
-.building-info span {
-  display: block;
-  color: var(--muted);
-  line-height: 1.35;
-}
-
-.building-progress {
-  position: absolute;
-  right: 12px;
-  bottom: 10px;
-  color: var(--blue);
-  font-weight: 900;
-}
-
-.play-panel {
-  position: relative;
-  background: rgba(255, 255, 255, 0.95);
-}
-
-.screen {
-  display: none;
-  height: 100%;
-  padding: 28px;
-}
-
-.screen.is-active {
-  display: flex;
-  flex-direction: column;
-}
-
-#startScreen,
-#finishScreen {
-  justify-content: center;
-}
-
-#startScreen p,
-#finishScreen p {
-  color: var(--muted);
-  font-size: 1.08rem;
-  line-height: 1.75;
-}
-
-.badge-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 18px;
-}
-
-.badge {
-  padding: 7px 10px;
-  border-radius: 999px;
-  background: #edf5f0;
-  color: #346c45;
-  font-weight: 900;
-}
-
-.start-actions,
-.task-actions {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-top: 18px;
-}
-
-.primary-btn,
-.ghost-btn,
-.icon-btn {
-  min-height: 46px;
-  border: 0;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 900;
-}
-
-.primary-btn {
-  padding: 0 18px;
-  color: #fff;
-  background: var(--green);
-}
-
-.ghost-btn {
-  padding: 0 18px;
-  color: var(--ink);
-  background: #edf3f6;
-}
-
-.icon-btn {
-  display: grid;
-  place-items: center;
-  width: 46px;
-  min-width: 46px;
-  color: var(--ink);
-  background: #edf3f6;
-  font-size: 1.5rem;
-}
-
-.unit-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-  margin-bottom: 18px;
-}
-
-.unit-header > div {
-  flex: 1;
-  min-width: 0;
-}
-
-.unit-header h2 {
-  margin-bottom: 0;
-}
-
-.progress-line {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 12px;
-  align-items: center;
-  margin-bottom: 18px;
-  color: var(--muted);
-  font-weight: 900;
-}
-
-.meter {
-  height: 12px;
-  border-radius: 999px;
-  background: #e6edf1;
-  overflow: hidden;
-}
-
-.meter i {
-  display: block;
-  width: 0;
-  height: 100%;
-  border-radius: inherit;
-  background: var(--yellow);
-  transition: width 220ms ease;
-}
-
-.visual-box {
-  display: grid;
-  place-items: center;
-  min-height: 170px;
-  margin-bottom: 18px;
-  border: 2px dashed #c8d6dd;
-  border-radius: 8px;
-  background: #f8fbfc;
-  overflow: hidden;
-}
-
-.scene {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  flex-wrap: wrap;
-  width: 100%;
-  padding: 20px;
-}
-
-.coin,
-.cube,
-.snack,
-.pizza-piece,
-.ruler-block {
-  display: grid;
-  place-items: center;
-  color: #fff;
-  font-weight: 900;
-}
-
-.coin {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  background: #d9a139;
-  border: 4px solid #f2ce72;
-}
-
-.cube {
-  width: 52px;
-  height: 52px;
-  border-radius: 8px;
-  background: #4ca6a8;
-  box-shadow: inset -10px -10px rgba(0, 0, 0, 0.08);
-}
-
-.snack {
-  width: 38px;
-  height: 38px;
-  border-radius: 50% 50% 46% 46%;
-  background: #d95b50;
-}
-
-.pizza {
-  display: grid;
-  grid-template-columns: repeat(4, 52px);
-  gap: 5px;
-}
-
-.pizza-piece {
-  height: 44px;
-  border-radius: 8px;
-  background: #f0b44c;
-  color: #7b461d;
-}
-
-.ruler {
-  display: flex;
-  align-items: flex-end;
-  gap: 4px;
-  padding: 14px;
-  border-radius: 8px;
-  background: #f7df96;
-}
-
-.ruler-block {
-  width: 30px;
-  height: 48px;
-  color: #31404a;
-  background: rgba(255, 255, 255, 0.45);
-  border-right: 2px solid rgba(49, 64, 74, 0.24);
-}
-
-.question-text {
-  min-height: 76px;
-  font-size: 1.35rem;
-  font-weight: 900;
-  line-height: 1.55;
-}
-
-.answer-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-}
-
-.answer-btn {
-  min-height: 62px;
-  padding: 12px;
-  border: 2px solid #d8e2e7;
-  border-radius: 8px;
-  background: #fff;
-  color: var(--ink);
-  cursor: pointer;
-  font-size: 1.1rem;
-  font-weight: 900;
-}
-
-.answer-btn:hover,
-.answer-btn:focus-visible {
-  border-color: var(--blue);
-  outline: 0;
-}
-
-.answer-btn.is-right {
-  border-color: var(--green);
-  background: #eaf6ed;
-}
-
-.answer-btn.is-wrong {
-  border-color: var(--red);
-  background: #fff0ee;
-}
-
-.feedback {
-  min-height: 58px;
-  margin-top: 14px;
-  padding: 12px 14px;
-  border-radius: 8px;
-  background: #f1f6f8;
-  color: var(--muted);
-  line-height: 1.45;
-  font-weight: 800;
-}
-
-.feedback.good {
-  background: #eaf6ed;
-  color: #346c45;
-}
-
-.feedback.try {
-  background: #fff3e6;
-  color: #85531f;
-}
-
-.finish-medal {
-  display: grid;
-  place-items: center;
-  width: 86px;
-  height: 86px;
-  margin-bottom: 18px;
-  border-radius: 50%;
-  color: #8a5a16;
-  background: #f6cc68;
-  font-size: 2.6rem;
-  font-weight: 900;
-}
-
-@media (max-width: 900px) {
-  .app-shell {
-    width: min(100vw - 18px, 680px);
-    padding: 12px 0;
-  }
-
-  .topbar {
-    align-items: flex-start;
-  }
-
-  .game-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .town-panel,
-  .play-panel {
-    min-height: auto;
-  }
-
-  .town-map {
-    min-height: 520px;
-    padding: 120px 14px 22px;
-    gap: 10px;
-  }
-
-  .building {
-    min-height: 142px;
-    padding: 10px;
-  }
-
-  .building-art {
-    width: 62px;
-    min-width: 62px;
-    height: 78px;
-  }
-
-  .building-art::before {
-    left: 23px;
-    top: 35px;
-    width: 38px;
-  }
-
-  .screen {
-    padding: 20px;
-  }
-
-  .answer-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 540px) {
-  .topbar {
-    flex-direction: column;
-  }
-
-  .town-map {
-    grid-template-columns: 1fr;
-    min-height: 760px;
-  }
-
-  .building {
-    min-height: 120px;
-  }
-
-  .question-text {
-    font-size: 1.15rem;
-  }
-}
-
-</style>
+      :root {
+        color-scheme: light;
+        --ink: #20313a;
+        --muted: #61717c;
+        --paper: #fffdf5;
+        --panel: #ffffff;
+        --line: #d9e3e7;
+        --soil: #94704d;
+        --grass: #66a95c;
+        --water: #5aa6cf;
+        --sun: #f0b84f;
+        --leaf: #3f8f5c;
+        --clay: #d66b55;
+        --stone: #778795;
+        --sky: #bde8f7;
+        --shadow: 0 18px 42px rgba(29, 48, 58, 0.14);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", system-ui, sans-serif;
+        color: var(--ink);
+        background:
+          linear-gradient(180deg, rgba(205, 236, 247, 0.96), rgba(255, 247, 218, 0.96)),
+          repeating-linear-gradient(45deg, rgba(32, 49, 58, 0.035) 0 18px, transparent 18px 36px);
+      }
+
+      button {
+        font: inherit;
+      }
+
+      .wrap {
+        width: min(1220px, calc(100vw - 28px));
+        margin: 0 auto;
+        padding: 22px 0;
+      }
+
+      .top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 14px;
+      }
+
+      .kicker {
+        margin: 0 0 6px;
+        color: #2f6f9d;
+        font-size: 0.88rem;
+        font-weight: 900;
+      }
+
+      h1,
+      h2,
+      h3,
+      p {
+        margin-top: 0;
+      }
+
+      h1 {
+        margin-bottom: 0;
+        font-size: clamp(2.1rem, 5vw, 3.5rem);
+        line-height: 1.05;
+      }
+
+      .hud {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(74px, 1fr));
+        gap: 9px;
+      }
+
+      .hud-card {
+        min-height: 72px;
+        padding: 10px;
+        border: 2px solid rgba(32, 49, 58, 0.09);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.8);
+        text-align: center;
+      }
+
+      .hud-card strong {
+        display: block;
+        font-size: 1.5rem;
+        line-height: 1.05;
+      }
+
+      .hud-card span {
+        color: var(--muted);
+        font-weight: 900;
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(340px, 1.08fr) minmax(360px, 0.92fr);
+        gap: 16px;
+        align-items: start;
+      }
+
+      .island,
+      .console {
+        border: 2px solid rgba(32, 49, 58, 0.08);
+        border-radius: 8px;
+        background: var(--panel);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+      }
+
+      .island {
+        position: relative;
+        min-height: 680px;
+        padding: 22px;
+        background:
+          linear-gradient(180deg, var(--sky) 0 31%, #7fca6e 31% 100%);
+      }
+
+      .island::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(255, 255, 255, 0.28) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255, 255, 255, 0.22) 1px, transparent 1px);
+        background-size: 42px 42px;
+        opacity: 0.32;
+        pointer-events: none;
+      }
+
+      .cloud {
+        position: absolute;
+        width: 126px;
+        height: 40px;
+        border-radius: 24px;
+        background: rgba(255, 255, 255, 0.9);
+      }
+
+      .cloud::before,
+      .cloud::after {
+        content: "";
+        position: absolute;
+        border-radius: 50%;
+        background: inherit;
+      }
+
+      .cloud::before {
+        width: 52px;
+        height: 52px;
+        top: -20px;
+        left: 18px;
+      }
+
+      .cloud::after {
+        width: 62px;
+        height: 62px;
+        top: -30px;
+        right: 18px;
+      }
+
+      .cloud.one {
+        left: 8%;
+        top: 46px;
+      }
+
+      .cloud.two {
+        right: 9%;
+        top: 82px;
+        transform: scale(0.78);
+      }
+
+      .block-map {
+        position: relative;
+        z-index: 1;
+        display: grid;
+        grid-template-columns: repeat(10, 1fr);
+        gap: 6px;
+        margin-top: 130px;
+        padding: 12px;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.32);
+      }
+
+      .tile {
+        aspect-ratio: 1;
+        border: 0;
+        border-radius: 5px;
+        background: var(--grass);
+        box-shadow:
+          inset 0 5px rgba(255, 255, 255, 0.2),
+          inset 0 -8px rgba(0, 0, 0, 0.1);
+      }
+
+      .tile.water {
+        background: var(--water);
+      }
+
+      .tile.soil {
+        background: var(--soil);
+      }
+
+      .tile.path {
+        background: #d6b36c;
+      }
+
+      .tile.zone {
+        position: relative;
+        display: grid;
+        place-items: center;
+        color: #fff;
+        cursor: pointer;
+        font-weight: 900;
+        outline: 3px solid rgba(255, 255, 255, 0.76);
+        outline-offset: -5px;
+        transition: filter 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+      }
+
+      .tile.zone:hover,
+      .tile.zone:focus-visible {
+        transform: translateY(-2px);
+        outline-color: #fff4a8;
+      }
+
+      .zone-icon {
+        display: grid;
+        place-items: center;
+        width: min(68%, 58px);
+        aspect-ratio: 1;
+        border-radius: 6px;
+        background: rgba(255, 255, 255, 0.22);
+        box-shadow: inset 0 -8px rgba(0, 0, 0, 0.12);
+        font-size: clamp(0.85rem, 2vw, 1.25rem);
+      }
+
+      .tile.zone.is-lit {
+        filter: saturate(1.22) brightness(1.1);
+        box-shadow:
+          0 0 0 3px rgba(255, 244, 168, 0.78),
+          0 0 22px rgba(255, 226, 105, 0.85),
+          inset 0 5px rgba(255, 255, 255, 0.3),
+          inset 0 -8px rgba(0, 0, 0, 0.09);
+      }
+
+      .tile.zone.is-complete {
+        filter: saturate(1.35) brightness(1.18);
+        box-shadow:
+          0 0 0 4px #fff4a8,
+          0 0 32px rgba(255, 226, 105, 0.96),
+          inset 0 7px rgba(255, 255, 255, 0.34),
+          inset 0 -8px rgba(0, 0, 0, 0.08);
+      }
+
+      .zone-progress {
+        position: absolute;
+        left: 7px;
+        right: 7px;
+        bottom: 7px;
+        height: 6px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.28);
+        overflow: hidden;
+      }
+
+      .zone-progress i {
+        display: block;
+        height: 100%;
+        border-radius: inherit;
+        background: #fff4a8;
+      }
+
+      .zone-done {
+        position: absolute;
+        right: 7px;
+        top: 6px;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #fff;
+        color: #34724c;
+        font-size: 0.72rem;
+        line-height: 18px;
+      }
+
+      .inventory {
+        position: relative;
+        z-index: 1;
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 9px;
+        margin-top: 16px;
+      }
+
+      .slot {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-height: 52px;
+        padding: 8px;
+        border: 2px solid rgba(32, 49, 58, 0.1);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.82);
+        font-weight: 900;
+      }
+
+      .sample-block {
+        width: 34px;
+        height: 34px;
+        border-radius: 5px;
+        box-shadow: inset 0 6px rgba(255, 255, 255, 0.24), inset 0 -7px rgba(0, 0, 0, 0.12);
+      }
+
+      .wood {
+        background: #b8834e;
+      }
+
+      .stone {
+        background: var(--stone);
+      }
+
+      .leaf {
+        background: var(--leaf);
+      }
+
+      .crystal {
+        background: #5f85d7;
+      }
+
+      .legend {
+        position: relative;
+        z-index: 1;
+        margin: 14px 0 0;
+        padding: 12px 14px;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.82);
+        color: var(--muted);
+        font-weight: 800;
+        line-height: 1.5;
+      }
+
+      .console {
+        min-height: 680px;
+        background: rgba(255, 255, 255, 0.96);
+      }
+
+      .screen {
+        display: none;
+        min-height: 680px;
+        padding: 26px;
+      }
+
+      .screen.active {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .intro {
+        justify-content: center;
+      }
+
+      .intro p,
+      .done p {
+        color: var(--muted);
+        font-size: 1.08rem;
+        line-height: 1.7;
+      }
+
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 18px;
+      }
+
+      .chip {
+        padding: 7px 10px;
+        border-radius: 999px;
+        background: #eef6f1;
+        color: #326f48;
+        font-weight: 900;
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 18px;
+      }
+
+      .primary,
+      .secondary,
+      .icon {
+        min-height: 46px;
+        border: 0;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 900;
+      }
+
+      .primary {
+        padding: 0 18px;
+        color: #fff;
+        background: #3f8f5c;
+      }
+
+      .secondary {
+        padding: 0 18px;
+        color: var(--ink);
+        background: #edf3f5;
+      }
+
+      .icon {
+        display: grid;
+        place-items: center;
+        width: 46px;
+        min-width: 46px;
+        color: var(--ink);
+        background: #edf3f5;
+        font-size: 1.35rem;
+      }
+
+      .task-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 14px;
+      }
+
+      .task-head > div {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .task-head h2 {
+        margin-bottom: 0;
+        font-size: 1.65rem;
+      }
+
+      .bar-row {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 14px;
+        color: var(--muted);
+        font-weight: 900;
+      }
+
+      .bar {
+        height: 12px;
+        border-radius: 999px;
+        background: #e5edf1;
+        overflow: hidden;
+      }
+
+      .bar i {
+        display: block;
+        width: 0;
+        height: 100%;
+        border-radius: inherit;
+        background: var(--sun);
+        transition: width 180ms ease;
+      }
+
+      .mission {
+        min-height: 132px;
+        padding: 18px;
+        border: 2px dashed #bfd2db;
+        border-radius: 8px;
+        background: #f8fbfc;
+      }
+
+      .mission-grid {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(44px, 1fr));
+        gap: 8px;
+      }
+
+      .mini-block {
+        display: grid;
+        place-items: center;
+        min-height: 48px;
+        border-radius: 6px;
+        color: #fff;
+        font-weight: 900;
+        box-shadow: inset 0 6px rgba(255, 255, 255, 0.23), inset 0 -8px rgba(0, 0, 0, 0.13);
+      }
+
+      .mini-block.dim {
+        opacity: 0.28;
+      }
+
+      .question {
+        min-height: 88px;
+        margin: 16px 0 12px;
+        font-size: 1.32rem;
+        font-weight: 900;
+        line-height: 1.55;
+      }
+
+      .step-boxes {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+        margin-bottom: 12px;
+      }
+
+      .step {
+        min-height: 72px;
+        padding: 10px;
+        border: 2px solid #d8e3e7;
+        border-radius: 8px;
+        background: #fff;
+      }
+
+      .step strong {
+        display: block;
+        margin-bottom: 5px;
+        color: #2f6f9d;
+      }
+
+      .answers {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .answer {
+        min-height: 62px;
+        padding: 10px;
+        border: 2px solid #d8e3e7;
+        border-radius: 8px;
+        background: #fff;
+        color: var(--ink);
+        cursor: pointer;
+        font-size: 1.08rem;
+        font-weight: 900;
+      }
+
+      .answer:hover,
+      .answer:focus-visible {
+        border-color: #3a82b5;
+        outline: 0;
+      }
+
+      .answer.good {
+        border-color: #3f8f5c;
+        background: #eaf6ed;
+      }
+
+      .answer.bad {
+        border-color: var(--clay);
+        background: #fff0ee;
+      }
+
+      .feedback {
+        min-height: 58px;
+        margin-top: 14px;
+        padding: 12px 14px;
+        border-radius: 8px;
+        background: #f0f6f8;
+        color: var(--muted);
+        font-weight: 850;
+        line-height: 1.5;
+      }
+
+      .feedback.good {
+        background: #eaf6ed;
+        color: #316a46;
+      }
+
+      .feedback.try {
+        background: #fff3e4;
+        color: #85531f;
+      }
+
+      .done {
+        justify-content: center;
+      }
+
+      .medal {
+        display: grid;
+        place-items: center;
+        width: 86px;
+        height: 86px;
+        margin-bottom: 18px;
+        border-radius: 8px;
+        background: var(--sun);
+        color: #6e4910;
+        box-shadow: inset 0 10px rgba(255, 255, 255, 0.25), inset 0 -12px rgba(0, 0, 0, 0.1);
+        font-size: 2.5rem;
+        font-weight: 900;
+      }
+
+      @media (max-width: 940px) {
+        .wrap {
+          width: min(100vw - 18px, 680px);
+          padding: 12px 0;
+        }
+
+        .top {
+          align-items: flex-start;
+        }
+
+        .layout {
+          grid-template-columns: 1fr;
+        }
+
+        .island,
+        .console,
+        .screen {
+          min-height: auto;
+        }
+
+        .island {
+          padding: 14px;
+        }
+
+        .block-map {
+          margin-top: 112px;
+          gap: 4px;
+          padding: 8px;
+        }
+
+        .inventory {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .screen {
+          padding: 20px;
+        }
+      }
+
+      @media (max-width: 560px) {
+        .top {
+          flex-direction: column;
+        }
+
+        .hud {
+          width: 100%;
+        }
+
+        .block-map {
+          grid-template-columns: repeat(5, 1fr);
+        }
+
+        .tile.hide-mobile {
+          display: none;
+        }
+
+        .answers,
+        .step-boxes {
+          grid-template-columns: 1fr;
+        }
+
+        .question {
+          font-size: 1.14rem;
+        }
+      }
+    </style>
   </head>
   <body>
-    <div class="app-shell">
-      <header class="topbar">
+    <div class="wrap">
+      <header class="top">
         <div>
-          <p class="eyebrow">康軒二下數學期末複習</p>
-          <h1>期末任務小鎮</h1>
+          <p class="kicker">康軒二下數學期末複習｜第 6-10 單元</p>
+          <h1>拯救方塊世界</h1>
         </div>
-        <div class="stats" aria-label="遊戲進度">
-          <div class="stat">
-            <span id="starCount">0</span>
-            <small>星星</small>
-          </div>
-          <div class="stat">
-            <span id="fixedCount">0/5</span>
-            <small>修復</small>
-          </div>
+        <div class="hud" aria-label="遊戲狀態">
+          <div class="hud-card"><strong id="starCount">0</strong><span>能量星</span></div>
+          <div class="hud-card"><strong id="buildCount">0/5</strong><span>救援點</span></div>
+          <div class="hud-card"><strong id="materialCount">0</strong><span>材料</span></div>
         </div>
       </header>
 
-      <main class="game-grid">
-        <section class="town-panel" aria-label="小鎮地圖">
-          <div class="sky">
-            <span class="cloud cloud-a"></span>
-            <span class="cloud cloud-b"></span>
+      <main class="layout">
+        <section class="island" aria-label="方塊世界地圖">
+          <span class="cloud one"></span>
+          <span class="cloud two"></span>
+          <div id="blockMap" class="block-map"></div>
+          <div class="inventory" aria-label="材料背包">
+            <div class="slot"><span class="sample-block wood"></span><span>木塊 <b id="woodCount">0</b></span></div>
+            <div class="slot"><span class="sample-block stone"></span><span>石塊 <b id="stoneCount">0</b></span></div>
+            <div class="slot"><span class="sample-block leaf"></span><span>葉塊 <b id="leafCount">0</b></span></div>
+            <div class="slot"><span class="sample-block crystal"></span><span>晶塊 <b id="crystalCount">0</b></span></div>
           </div>
-          <div id="townMap" class="town-map"></div>
-          <div class="town-path" aria-hidden="true"></div>
+          <p class="legend">點地圖上的彩色方塊接任務。答對會取得材料，材料會自動點亮橋、塔、倉庫、廚房和花園。</p>
         </section>
 
-        <section class="play-panel">
-          <div id="startScreen" class="screen is-active">
-            <div class="badge-row" aria-hidden="true">
-              <span class="badge">算一算</span>
-              <span class="badge">量一量</span>
-              <span class="badge">分一分</span>
+        <section class="console" aria-label="任務面板">
+          <div id="introScreen" class="screen intro active">
+            <div class="chips">
+              <span class="chip">採集</span>
+              <span class="chip">建造</span>
+              <span class="chip">救援</span>
+              <span class="chip">複習</span>
             </div>
-            <h2>幫小鎮完成期末準備</h2>
-            <p>
-              每個地方都有 6 個小任務。答對會點亮建築，答錯會拿到提示，
-              全部完成後，小鎮就會準備好迎接期末日。
-            </p>
-            <div class="start-actions">
-              <button id="startBtn" class="primary-btn" type="button">開始任務</button>
-              <button id="resetBtn" class="ghost-btn" type="button">重新開始</button>
+            <h2>方塊世界的核心熄滅了</h2>
+            <p>你是方塊守護員。完成數學任務可以取得材料，把五個救援點一個一個點亮。答錯不用怕，系統會給你提示方塊。</p>
+            <div class="actions">
+              <button id="startBtn" class="primary" type="button">開始救援</button>
+              <button id="resetBtn" class="secondary" type="button">重新開始</button>
             </div>
           </div>
 
-          <div id="unitScreen" class="screen">
-            <div class="unit-header">
-              <button id="backBtn" class="icon-btn" type="button" aria-label="回到地圖">‹</button>
+          <div id="taskScreen" class="screen">
+            <div class="task-head">
+              <button id="homeBtn" class="icon" type="button" aria-label="回到說明">‹</button>
               <div>
-                <p id="unitKicker" class="eyebrow">任務</p>
-                <h2 id="unitTitle">補給商店</h2>
+                <p id="unitTopic" class="kicker">任務</p>
+                <h2 id="unitTitle"></h2>
               </div>
-              <button id="readBtn" class="icon-btn" type="button" aria-label="朗讀題目">▶</button>
+              <button id="speakBtn" class="icon" type="button" aria-label="朗讀題目">▶</button>
             </div>
-
-            <div class="progress-line">
-              <span id="questionProgress"></span>
-              <div class="meter" aria-hidden="true">
-                <i id="unitMeter"></i>
-              </div>
+            <div class="bar-row">
+              <span id="progressText">1/6</span>
+              <div class="bar" aria-hidden="true"><i id="progressBar"></i></div>
             </div>
-
-            <div id="visualBox" class="visual-box" aria-hidden="true"></div>
-            <p id="questionText" class="question-text"></p>
-            <div id="answerGrid" class="answer-grid"></div>
-
+            <div id="mission" class="mission"></div>
+            <p id="question" class="question"></p>
+            <div id="steps" class="step-boxes"></div>
+            <div id="answers" class="answers"></div>
             <div id="feedback" class="feedback" role="status"></div>
-
-            <div class="task-actions">
-              <button id="hintBtn" class="ghost-btn" type="button">看提示</button>
-              <button id="nextBtn" class="primary-btn" type="button" hidden>下一題</button>
+            <div class="actions">
+              <button id="hintBtn" class="secondary" type="button">提示方塊</button>
+              <button id="nextBtn" class="primary" type="button" hidden>下一個任務</button>
             </div>
           </div>
 
-          <div id="finishScreen" class="screen">
-            <div class="finish-medal" aria-hidden="true">★</div>
-            <h2>小鎮準備好了</h2>
-            <p id="finishText"></p>
-            <div class="start-actions">
-              <button id="reviewBtn" class="primary-btn" type="button">練習錯題</button>
-              <button id="playAgainBtn" class="ghost-btn" type="button">再玩一次</button>
+          <div id="doneScreen" class="screen done">
+            <div class="medal">完</div>
+            <h2>方塊世界被拯救了</h2>
+            <p id="doneText"></p>
+            <div class="actions">
+              <button id="reviewBtn" class="primary" type="button">練習錯題</button>
+              <button id="againBtn" class="secondary" type="button">重新挑戰</button>
             </div>
           </div>
         </section>
@@ -714,362 +750,407 @@ h2 {
     </div>
 
     <script>
-const units = [
-  {
-    id: "shop",
-    title: "補給商店",
-    topic: "兩步驟應用問題",
-    color: "#f1a34c",
-    intro: "先看清楚做了哪兩件事，再一步一步算。",
-    questions: [
-      q("小安有 4 盒鉛筆，每盒 3 枝，又多買 2 枝。現在共有幾枝？", ["14 枝", "12 枝", "9 枝", "17 枝"], "14 枝", "先算 4 盒共有 4×3，再加 2。", "coins:4"),
-      q("一包貼紙有 5 張，老師買 3 包，送給學生 4 張後，還剩幾張？", ["11 張", "15 張", "9 張", "19 張"], "11 張", "先算 3 包共有 15 張，再減 4 張。", "snacks:5"),
-      q("桌上有 18 顆糖，先吃掉 6 顆，剩下的平均放進 3 個盒子，每盒幾顆？", ["4 顆", "6 顆", "8 顆", "12 顆"], "4 顆", "先算剩下 12 顆，再分成 3 盒。", "snacks:6"),
-      q("一排有 4 張椅子，排了 5 排，又搬走 3 張。還有幾張椅子？", ["17 張", "20 張", "12 張", "23 張"], "17 張", "先算 4×5，再減 3。", "cubes:5"),
-      q("小美有 30 元，買了 2 個 8 元的麵包，還剩幾元？", ["14 元", "16 元", "22 元", "12 元"], "14 元", "先算 2 個麵包 16 元，再用 30 減 16。", "coins:6"),
-      q("每袋有 6 顆球，2 袋再加上 5 顆，共有幾顆球？", ["17 顆", "12 顆", "13 顆", "22 顆"], "17 顆", "先算 2 袋是 12 顆，再加 5 顆。", "snacks:6")
-    ]
-  },
-  {
-    id: "yard",
-    title: "測量工地",
-    topic: "公尺和公分",
-    color: "#4f9b63",
-    intro: "1 公尺是 100 公分，長度加減要注意單位。",
-    questions: [
-      q("1 公尺 20 公分等於幾公分？", ["120 公分", "102 公分", "80 公分", "112 公分"], "120 公分", "1 公尺是 100 公分，100 加 20。", "ruler:4"),
-      q("150 公分等於幾公尺幾公分？", ["1 公尺 50 公分", "15 公尺", "1 公尺 5 公分", "50 公尺"], "1 公尺 50 公分", "100 公分可以換成 1 公尺。", "ruler:5"),
-      q("繩子長 2 公尺，剪掉 60 公分，還剩幾公分？", ["140 公分", "160 公分", "260 公分", "40 公分"], "140 公分", "2 公尺先換成 200 公分。", "ruler:6"),
-      q("鉛筆長 15 公分，橡皮擦長 5 公分，兩個接起來長幾公分？", ["20 公分", "10 公分", "25 公分", "15 公分"], "20 公分", "把兩段長度加起來。", "ruler:3"),
-      q("門高大約 2 公尺，下面哪一個最接近？", ["200 公分", "20 公分", "2 公分", "2000 公分"], "200 公分", "2 公尺就是 200 公分。", "ruler:5"),
-      q("彩帶長 90 公分，再接上 30 公分，共長幾公尺幾公分？", ["1 公尺 20 公分", "120 公尺", "12 公分", "1 公尺 2 公分"], "1 公尺 20 公分", "90 加 30 是 120 公分。", "ruler:4")
-    ]
-  },
-  {
-    id: "warehouse",
-    title: "積木倉庫",
-    topic: "分類與立體形體",
-    color: "#4ca6a8",
-    intro: "先找大分類，再看形狀、大小或特徵。",
-    questions: [
-      q("先用「會滾、不會滾」分類，球應該放在哪一類？", ["會滾", "不會滾", "兩類都不是", "要看顏色"], "會滾", "球的表面圓圓的，可以滾動。", "cubes:4"),
-      q("正方體每個面的形狀最像哪一種？", ["正方形", "長方形", "三角形", "圓形"], "正方形", "正方體的面都是一樣大的正方形。", "cubes:6"),
-      q("長方體和正方體最適合先放在哪個大分類？", ["立體形體", "平面圖形", "數字", "時間"], "立體形體", "可以拿起來、堆起來的是立體形體。", "cubes:5"),
-      q("要把書本、餅乾盒、積木再細分，可以用哪個特徵？", ["形狀", "今天星期幾", "誰先拿到", "聲音大小"], "形狀", "分類要看物品本身的共同特徵。", "cubes:5"),
-      q("下面哪一個比較像長方體？", ["鞋盒", "籃球", "盤子", "硬幣"], "鞋盒", "鞋盒有長方形的面，像長方體。", "cubes:3"),
-      q("先分成食物和文具，再把文具分成筆和本子，這叫什麼？", ["先大分類再小分類", "只看顏色", "只算數量", "不能分類"], "先大分類再小分類", "先分大類，再在同一類裡細分。", "cubes:4")
-    ]
-  },
-  {
-    id: "bakery",
-    title: "點心工坊",
-    topic: "分分看",
-    color: "#d95b50",
-    intro: "公平分就是每個人拿到一樣多。",
-    questions: [
-      q("12 顆餅乾平均分給 3 人，每人幾顆？", ["4 顆", "3 顆", "6 顆", "9 顆"], "4 顆", "想 3 個人每人 4 顆，剛好 12 顆。", "snacks:12"),
-      q("16 顆糖平均放進 4 個袋子，每袋幾顆？", ["4 顆", "8 顆", "12 顆", "2 顆"], "4 顆", "4、4、4、4 合起來是 16。", "snacks:10"),
-      q("10 個蘋果平均分給 5 人，每人幾個？", ["2 個", "5 個", "3 個", "1 個"], "2 個", "5 人每人 2 個，剛好 10 個。", "snacks:10"),
-      q("下面哪一種是平分？", ["每人 3 顆", "有人 4 顆有人 2 顆", "只給第一個人", "剩下不分"], "每人 3 顆", "平分要每一份都一樣多。", "snacks:6"),
-      q("18 張卡片平均分給 6 人，每人幾張？", ["3 張", "6 張", "12 張", "4 張"], "3 張", "6 個 3 是 18。", "snacks:9"),
-      q("14 顆珠子平均分成 2 份，每份幾顆？", ["7 顆", "6 顆", "8 顆", "12 顆"], "7 顆", "分成兩份一樣多，就是一半。", "snacks:8")
-    ]
-  },
-  {
-    id: "plaza",
-    title: "披薩廣場",
-    topic: "分數",
-    color: "#3d7fb6",
-    intro: "先看全部分成幾份，再看拿了幾份。",
-    questions: [
-      q("一個披薩平均分成 4 份，吃掉 1 份，是幾分之幾？", ["1/4", "1/2", "3/4", "4/1"], "1/4", "下面的數字 4 表示平均分成 4 份。", "pizza:1/4"),
-      q("一條巧克力平均分成 2 份，拿 1 份，是多少？", ["1/2", "1/4", "2/1", "2/2"], "1/2", "平均分成 2 份，拿 1 份。", "pizza:1/2"),
-      q("一個圓平均分成 3 份，塗 2 份，可以記成？", ["2/3", "1/3", "3/2", "3/3"], "2/3", "分母是總份數，分子是塗色份數。", "pizza:2/3"),
-      q("1/2 和 1/4 哪一個比較大？", ["1/2", "1/4", "一樣大", "不能比"], "1/2", "同一個東西平均分，分成 2 份的每份比較大。", "pizza:1/2"),
-      q("把一張紙平均分成 5 份，拿 3 份，是幾分之幾？", ["3/5", "5/3", "1/5", "2/5"], "3/5", "5 份中的 3 份，記成 3/5。", "pizza:3/5"),
-      q("4/4 表示什麼？", ["全部", "一半", "四分之一", "沒有"], "全部", "平均分成 4 份，拿了 4 份就是全部。", "pizza:4/4")
-    ]
-  }
-];
+      const units = [
+        {
+          id: "workshop",
+          title: "材料工坊",
+          topic: "第六單元｜兩步驟應用問題",
+          color: "#c4834e",
+          icon: "工",
+          material: "wood",
+          intro: "先找第一件事，再算第二件事。",
+          questions: [
+            task("有 4 堆木塊，每堆 3 塊，又採到 2 塊。共有幾塊木塊？", ["14 塊", "12 塊", "9 塊", "17 塊"], "14 塊", ["先算 4 堆共有 4×3。", "再把新採到的 2 塊加上去。"], "先算 4×3，再加 2。", "wood:4"),
+            task("晶石每盒 5 顆，拿了 3 盒，用掉 4 顆後還剩幾顆？", ["11 顆", "15 顆", "9 顆", "19 顆"], "11 顆", ["先算 3 盒共有 15 顆。", "再算 15-4。"], "先乘再減。", "crystal:5"),
+            task("修橋要 18 塊石頭，已放 6 塊，剩下平均分給 3 台車，每台車幾塊？", ["4 塊", "6 塊", "8 塊", "12 塊"], "4 塊", ["先算還有 12 塊。", "再把 12 塊分給 3 台車。"], "先減再平分。", "stone:6"),
+            task("一排種 4 棵苗，種了 5 排，又拔掉 3 棵壞苗。還有幾棵？", ["17 棵", "20 棵", "12 棵", "23 棵"], "17 棵", ["先算 4×5。", "再減掉 3 棵。"], "先乘再減。", "leaf:5"),
+            task("工具箱有 30 個螺絲，修 2 台機器各用 8 個。還剩幾個？", ["14 個", "16 個", "22 個", "12 個"], "14 個", ["先算 2 台共用 16 個。", "再算 30-16。"], "各用 8 個代表 8 的 2 倍。", "stone:4"),
+            task("每袋有 6 顆種子，2 袋再加 5 顆，共有幾顆種子？", ["17 顆", "12 顆", "13 顆", "22 顆"], "17 顆", ["先算 2 袋共有 12 顆。", "再加上 5 顆。"], "先乘再加。", "leaf:6")
+          ]
+        },
+        {
+          id: "bridge",
+          title: "量尺橋",
+          topic: "第七單元｜公尺和公分",
+          color: "#4f9860",
+          icon: "尺",
+          material: "stone",
+          intro: "1 公尺是 100 公分，先把單位看清楚。",
+          questions: [
+            task("1 公尺 20 公分可以換成幾公分？", ["120 公分", "102 公分", "80 公分", "112 公分"], "120 公分", ["1 公尺是 100 公分。", "100 公分再加 20 公分。"], "1 公尺 = 100 公分。", "ruler:4"),
+            task("150 公分可以說成幾公尺幾公分？", ["1 公尺 50 公分", "15 公尺", "1 公尺 5 公分", "50 公尺"], "1 公尺 50 公分", ["先拿出 100 公分換成 1 公尺。", "剩下 50 公分。"], "100 公分是一公尺。", "ruler:5"),
+            task("繩子長 2 公尺，剪掉 60 公分，還剩幾公分？", ["140 公分", "160 公分", "260 公分", "40 公分"], "140 公分", ["2 公尺先換成 200 公分。", "再算 200-60。"], "先換成同一單位。", "ruler:6"),
+            task("鉛筆長 15 公分，橡皮擦長 5 公分，接起來長幾公分？", ["20 公分", "10 公分", "25 公分", "15 公分"], "20 公分", ["兩段接起來用加法。", "15+5=20。"], "同樣都是公分，可以直接相加。", "ruler:3"),
+            task("門的高度大約 2 公尺，最接近下面哪一個？", ["200 公分", "20 公分", "2 公分", "2000 公分"], "200 公分", ["1 公尺是 100 公分。", "2 公尺就是 200 公分。"], "想想門比鉛筆高很多。", "ruler:5"),
+            task("彩帶 90 公分，再接上 30 公分，共長幾公尺幾公分？", ["1 公尺 20 公分", "120 公尺", "12 公分", "1 公尺 2 公分"], "1 公尺 20 公分", ["先算 90+30=120 公分。", "120 公分是 1 公尺 20 公分。"], "120 公分超過 100 公分。", "ruler:4")
+          ]
+        },
+        {
+          id: "warehouse",
+          title: "分類倉庫",
+          topic: "第八單元｜分類與立體形體",
+          color: "#4a9aa0",
+          icon: "倉",
+          material: "leaf",
+          intro: "分類要找共同特徵，也可以先大分類再小分類。",
+          questions: [
+            task("用「會滾、不會滾」分類，球要放在哪一格？", ["會滾", "不會滾", "看顏色", "放中間"], "會滾", ["球的面是圓圓的。", "圓圓的東西容易滾動。"], "先看形狀，不是看顏色。", "shape:roll"),
+            task("正方體每個面的形狀最像哪一種？", ["正方形", "長方形", "三角形", "圓形"], "正方形", ["正方體的六個面一樣大。", "每個面都是正方形。"], "想想積木方塊的每一面。", "shape:cube"),
+            task("長方體和正方體都可以放進哪一個大分類？", ["立體形體", "平面圖形", "數字", "時間"], "立體形體", ["它們可以拿起來、堆起來。", "有長、寬、高。"], "不是只畫在紙上的圖形。", "shape:solid"),
+            task("要把盒子、球、積木再細分，最適合看哪個特徵？", ["形狀", "今天星期幾", "誰先拿", "聲音大小"], "形狀", ["物品分類要看共同特徵。", "盒子、球、積木的形狀不同。"], "找物品本身看得到的特徵。", "shape:sort"),
+            task("下面哪一個比較像長方體？", ["鞋盒", "籃球", "硬幣", "圓盤"], "鞋盒", ["鞋盒有長方形的面。", "可以像長方體一樣堆放。"], "球和硬幣不是長方體。", "shape:box"),
+            task("先分成食物和文具，再把文具分成筆和本子，這是？", ["先大分類再小分類", "只看顏色", "只算數量", "不能分類"], "先大分類再小分類", ["食物和文具是大分類。", "筆和本子是文具裡的小分類。"], "分類可以一層一層做。", "shape:sort")
+          ]
+        },
+        {
+          id: "kitchen",
+          title: "分享廚房",
+          topic: "第九單元｜分分看",
+          color: "#cf6753",
+          icon: "分",
+          material: "wood",
+          intro: "平分就是每一份都一樣多。",
+          questions: [
+            task("12 顆果實平均分給 3 個工作台，每台幾顆？", ["4 顆", "3 顆", "6 顆", "9 顆"], "4 顆", ["3 個工作台要一樣多。", "4、4、4 合起來是 12。"], "平均分，每份一樣多。", "share:12"),
+            task("16 個餅乾平均放進 4 個盒子，每盒幾個？", ["4 個", "8 個", "12 個", "2 個"], "4 個", ["4 個盒子都一樣多。", "4 個 4 是 16。"], "可以一個盒子一個盒子放。", "share:16"),
+            task("10 顆蘋果平均分給 5 人，每人幾顆？", ["2 顆", "5 顆", "3 顆", "1 顆"], "2 顆", ["5 人每人 2 顆。", "2+2+2+2+2=10。"], "想成 10 裡面有幾個 5 份。", "share:10"),
+            task("下面哪一種是平分？", ["每人 3 顆", "有人 4 顆有人 2 顆", "只給第一人", "剩下不分"], "每人 3 顆", ["每個人要拿一樣多。", "每人 3 顆符合平分。"], "只要不一樣多，就不是平分。", "share:9"),
+            task("18 張卡片平均分給 6 人，每人幾張？", ["3 張", "6 張", "12 張", "4 張"], "3 張", ["6 人每人 3 張。", "6 個 3 是 18。"], "一份一份平均分。", "share:18"),
+            task("14 顆珠子平均分成 2 份，每份幾顆？", ["7 顆", "6 顆", "8 顆", "12 顆"], "7 顆", ["分成兩份一樣多。", "7+7=14。"], "兩份一樣多，也可以想一半。", "share:14")
+          ]
+        },
+        {
+          id: "garden",
+          title: "分數花園",
+          topic: "第十單元｜分數",
+          color: "#557fd0",
+          icon: "1/2",
+          material: "crystal",
+          intro: "先看平均分成幾份，再看拿了幾份。",
+          questions: [
+            task("一塊能量田平均分成 4 份，亮起 1 份，是幾分之幾？", ["1/4", "1/2", "3/4", "4/1"], "1/4", ["總共平均分成 4 份。", "亮起其中 1 份。"], "分母是總份數，分子是亮起份數。", "fraction:1/4"),
+            task("一條晶片平均分成 2 份，拿 1 份，是多少？", ["1/2", "1/4", "2/1", "2/2"], "1/2", ["平均分成 2 份。", "拿其中 1 份。"], "2 份中的 1 份。", "fraction:1/2"),
+            task("一片田平均分成 3 份，種了 2 份，可以記成？", ["2/3", "1/3", "3/2", "3/3"], "2/3", ["總份數是 3。", "種了其中 2 份。"], "分子在上面，表示選到的份數。", "fraction:2/3"),
+            task("同樣大小的能量板，1/2 和 1/4 哪個比較大？", ["1/2", "1/4", "一樣大", "不能比"], "1/2", ["平均分成 2 份時，每份比較大。", "平均分成 4 份時，每份比較小。"], "同一個東西分越少份，每份越大。", "fraction:1/2"),
+            task("一張地圖平均分成 5 份，找到 3 份，是幾分之幾？", ["3/5", "5/3", "1/5", "2/5"], "3/5", ["總共 5 份。", "找到 3 份。"], "5 份中的 3 份。", "fraction:3/5"),
+            task("4/4 表示什麼？", ["全部", "一半", "四分之一", "沒有"], "全部", ["平均分成 4 份。", "4 份都拿到。"], "全部的份數都選到了。", "fraction:4/4")
+          ]
+        }
+      ];
 
-const state = {
-  currentUnit: null,
-  currentIndex: 0,
-  answered: false,
-  stars: 0,
-  mistakes: [],
-  progress: {}
-};
+      const state = {
+        unit: null,
+        index: 0,
+        answered: false,
+        stars: 0,
+        progress: {},
+        materials: { wood: 0, stone: 0, leaf: 0, crystal: 0 },
+        mistakes: []
+      };
 
-const els = {
-  townMap: document.querySelector("#townMap"),
-  startScreen: document.querySelector("#startScreen"),
-  unitScreen: document.querySelector("#unitScreen"),
-  finishScreen: document.querySelector("#finishScreen"),
-  starCount: document.querySelector("#starCount"),
-  fixedCount: document.querySelector("#fixedCount"),
-  unitKicker: document.querySelector("#unitKicker"),
-  unitTitle: document.querySelector("#unitTitle"),
-  questionProgress: document.querySelector("#questionProgress"),
-  unitMeter: document.querySelector("#unitMeter"),
-  visualBox: document.querySelector("#visualBox"),
-  questionText: document.querySelector("#questionText"),
-  answerGrid: document.querySelector("#answerGrid"),
-  feedback: document.querySelector("#feedback"),
-  nextBtn: document.querySelector("#nextBtn"),
-  hintBtn: document.querySelector("#hintBtn"),
-  finishText: document.querySelector("#finishText")
-};
+      const el = {
+        blockMap: document.querySelector("#blockMap"),
+        introScreen: document.querySelector("#introScreen"),
+        taskScreen: document.querySelector("#taskScreen"),
+        doneScreen: document.querySelector("#doneScreen"),
+        starCount: document.querySelector("#starCount"),
+        buildCount: document.querySelector("#buildCount"),
+        materialCount: document.querySelector("#materialCount"),
+        woodCount: document.querySelector("#woodCount"),
+        stoneCount: document.querySelector("#stoneCount"),
+        leafCount: document.querySelector("#leafCount"),
+        crystalCount: document.querySelector("#crystalCount"),
+        unitTopic: document.querySelector("#unitTopic"),
+        unitTitle: document.querySelector("#unitTitle"),
+        progressText: document.querySelector("#progressText"),
+        progressBar: document.querySelector("#progressBar"),
+        mission: document.querySelector("#mission"),
+        question: document.querySelector("#question"),
+        steps: document.querySelector("#steps"),
+        answers: document.querySelector("#answers"),
+        feedback: document.querySelector("#feedback"),
+        nextBtn: document.querySelector("#nextBtn"),
+        doneText: document.querySelector("#doneText")
+      };
 
-document.querySelector("#startBtn").addEventListener("click", startFirstTask);
-document.querySelector("#resetBtn").addEventListener("click", resetGame);
-document.querySelector("#backBtn").addEventListener("click", () => showScreen("start"));
-document.querySelector("#nextBtn").addEventListener("click", nextQuestion);
-document.querySelector("#hintBtn").addEventListener("click", showHint);
-document.querySelector("#readBtn").addEventListener("click", readQuestion);
-document.querySelector("#reviewBtn").addEventListener("click", startReview);
-document.querySelector("#playAgainBtn").addEventListener("click", resetGame);
+      document.querySelector("#startBtn").addEventListener("click", startFirstTask);
+      document.querySelector("#resetBtn").addEventListener("click", resetGame);
+      document.querySelector("#homeBtn").addEventListener("click", () => show("intro"));
+      document.querySelector("#hintBtn").addEventListener("click", showHint);
+      document.querySelector("#nextBtn").addEventListener("click", nextTask);
+      document.querySelector("#speakBtn").addEventListener("click", speakQuestion);
+      document.querySelector("#reviewBtn").addEventListener("click", reviewMistake);
+      document.querySelector("#againBtn").addEventListener("click", resetGame);
 
-loadGame();
-renderTown();
-renderStats();
+      load();
+      drawMap();
+      renderHud();
 
-function q(text, answers, correct, hint, visual) {
-  return { text, answers, correct, hint, visual };
-}
+      function task(text, answers, correct, steps, hint, visual) {
+        return { text, answers, correct, steps, hint, visual };
+      }
 
-function showScreen(name) {
-  els.startScreen.classList.toggle("is-active", name === "start");
-  els.unitScreen.classList.toggle("is-active", name === "unit");
-  els.finishScreen.classList.toggle("is-active", name === "finish");
+      function show(name) {
+        el.introScreen.classList.toggle("active", name === "intro");
+        el.taskScreen.classList.toggle("active", name === "task");
+        el.doneScreen.classList.toggle("active", name === "done");
+        if (name === "task" && window.matchMedia("(max-width: 940px)").matches) {
+          requestAnimationFrame(() => el.taskScreen.scrollIntoView({ block: "start", behavior: "smooth" }));
+        }
+      }
 
-  if (name === "unit" && window.matchMedia("(max-width: 900px)").matches) {
-    requestAnimationFrame(() => {
-      els.unitScreen.scrollIntoView({ block: "start", behavior: "smooth" });
-    });
-  }
-}
+      function drawMap() {
+        const layout = [
+          "wwwwwwwwww",
+          "wggggggggw",
+          "wgZgppgZgw",
+          "wgggppgggw",
+          "wpppZpppgw",
+          "wgggppgggw",
+          "wgZgppgZgw",
+          "wggggggggw",
+          "wssggggssw",
+          "wwwwwwwwww"
+        ];
+        const zones = [
+          { pos: 22, unit: "workshop" },
+          { pos: 27, unit: "bridge" },
+          { pos: 44, unit: "warehouse" },
+          { pos: 62, unit: "kitchen" },
+          { pos: 67, unit: "garden" }
+        ];
+        const zoneByPos = Object.fromEntries(zones.map((item) => [item.pos, item.unit]));
+        el.blockMap.innerHTML = "";
+        layout.join("").split("").forEach((char, index) => {
+          const unitId = zoneByPos[index];
+          const unit = units.find((item) => item.id === unitId);
+          const tile = document.createElement(unit ? "button" : "span");
+          tile.className = "tile";
+          if (char === "w") tile.classList.add("water");
+          if (char === "s") tile.classList.add("soil");
+          if (char === "p") tile.classList.add("path");
+          if (index > 74) tile.classList.add("hide-mobile");
+          if (unit) {
+            const progress = state.progress[unit.id] || 0;
+            const percent = Math.round((progress / unit.questions.length) * 100);
+            const done = progress >= unit.questions.length;
+            tile.type = "button";
+            tile.classList.add("zone");
+            if (progress > 0) tile.classList.add("is-lit");
+            if (done) tile.classList.add("is-complete");
+            tile.style.background = unit.color;
+            tile.setAttribute("aria-label", unit.title);
+            tile.innerHTML = `<span class="zone-icon">${unit.icon}</span><span class="zone-progress"><i style="width:${percent}%"></i></span>${done ? '<span class="zone-done">✓</span>' : ""}`;
+            tile.addEventListener("click", () => startUnit(unit.id));
+          }
+          el.blockMap.appendChild(tile);
+        });
+      }
 
-function renderTown() {
-  els.townMap.innerHTML = "";
-  units.forEach((unit) => {
-    const done = state.progress[unit.id] || 0;
-    const complete = done >= unit.questions.length;
-    const button = document.createElement("button");
-    button.className = `building ${complete ? "is-complete" : "is-locked"}`;
-    button.style.setProperty("--unit-color", unit.color);
-    button.type = "button";
-    button.innerHTML = `
-      <span class="building-art"></span>
-      <span class="building-info">
-        <strong>${unit.title}</strong>
-        <span>${unit.topic}</span>
-      </span>
-      <span class="building-progress">${done}/${unit.questions.length}</span>
-    `;
-    button.addEventListener("click", () => startUnit(unit.id));
-    els.townMap.appendChild(button);
-  });
-}
+      function renderHud() {
+        const complete = units.filter((unit) => (state.progress[unit.id] || 0) >= unit.questions.length).length;
+        const totalMaterials = Object.values(state.materials).reduce((sum, value) => sum + value, 0);
+        el.starCount.textContent = state.stars;
+        el.buildCount.textContent = `${complete}/5`;
+        el.materialCount.textContent = totalMaterials;
+        el.woodCount.textContent = state.materials.wood;
+        el.stoneCount.textContent = state.materials.stone;
+        el.leafCount.textContent = state.materials.leaf;
+        el.crystalCount.textContent = state.materials.crystal;
+        save();
+      }
 
-function renderStats() {
-  const completeCount = units.filter((unit) => (state.progress[unit.id] || 0) >= unit.questions.length).length;
-  els.starCount.textContent = state.stars;
-  els.fixedCount.textContent = `${completeCount}/5`;
-  saveGame();
-}
+      function startFirstTask() {
+        const next = units.find((unit) => (state.progress[unit.id] || 0) < unit.questions.length);
+        if (next) startUnit(next.id);
+        else finish();
+      }
 
-function startUnit(unitId) {
-  state.currentUnit = units.find((unit) => unit.id === unitId);
-  state.currentIndex = Math.min(state.progress[unitId] || 0, state.currentUnit.questions.length - 1);
-  renderQuestion();
-  showScreen("unit");
-}
+      function startUnit(id) {
+        state.unit = units.find((unit) => unit.id === id);
+        state.index = Math.min(state.progress[id] || 0, state.unit.questions.length - 1);
+        renderTask();
+        show("task");
+      }
 
-function startFirstTask() {
-  const unit = units.find((item) => (state.progress[item.id] || 0) < item.questions.length);
-  if (unit) {
-    startUnit(unit.id);
-    return;
-  }
-  finishGame();
-}
+      function renderTask() {
+        const unit = state.unit;
+        const q = unit.questions[state.index];
+        state.answered = false;
+        el.unitTopic.textContent = unit.topic;
+        el.unitTitle.textContent = unit.title;
+        el.progressText.textContent = `${state.index + 1}/${unit.questions.length}`;
+        el.progressBar.style.width = `${(state.index / unit.questions.length) * 100}%`;
+        el.mission.innerHTML = visual(q.visual);
+        el.question.textContent = q.text;
+        el.steps.innerHTML = q.steps.map((step, index) => `<div class="step"><strong>第 ${index + 1} 步</strong>${step}</div>`).join("");
+        el.answers.innerHTML = "";
+        shuffle(q.answers).forEach((answer) => {
+          const button = document.createElement("button");
+          button.className = "answer";
+          button.type = "button";
+          button.textContent = answer;
+          button.addEventListener("click", () => choose(button, answer));
+          el.answers.appendChild(button);
+        });
+        el.feedback.className = "feedback";
+        el.feedback.textContent = unit.intro;
+        el.nextBtn.hidden = true;
+      }
 
-function renderQuestion() {
-  const unit = state.currentUnit;
-  const question = unit.questions[state.currentIndex];
-  state.answered = false;
-  els.unitKicker.textContent = unit.topic;
-  els.unitTitle.textContent = unit.title;
-  els.questionProgress.textContent = `${state.currentIndex + 1}/${unit.questions.length}`;
-  els.unitMeter.style.width = `${(state.currentIndex / unit.questions.length) * 100}%`;
-  els.visualBox.innerHTML = visualHTML(question.visual);
-  els.questionText.textContent = question.text;
-  els.feedback.className = "feedback";
-  els.feedback.textContent = unit.intro;
-  els.nextBtn.hidden = true;
-  els.answerGrid.innerHTML = "";
+      function choose(button, answer) {
+        if (state.answered) return;
+        const q = state.unit.questions[state.index];
+        const correct = answer === q.correct;
+        button.classList.add(correct ? "good" : "bad");
+        if (correct) {
+          state.answered = true;
+          state.stars += 1;
+          state.materials[state.unit.material] += 1;
+          state.progress[state.unit.id] = Math.max(state.progress[state.unit.id] || 0, state.index + 1);
+          el.feedback.className = "feedback good";
+          el.feedback.textContent = `答對了，取得 1 個${materialName(state.unit.material)}，救援進度增加。`;
+          el.nextBtn.hidden = false;
+          [...el.answers.children].forEach((child) => {
+            child.disabled = true;
+            if (child.textContent === q.correct) child.classList.add("good");
+          });
+          drawMap();
+        } else {
+          el.feedback.className = "feedback try";
+          el.feedback.textContent = `提示方塊：${q.hint}`;
+          state.mistakes.push({ unitId: state.unit.id, index: state.index });
+          button.disabled = true;
+        }
+        renderHud();
+      }
 
-  shuffle([...question.answers]).forEach((answer) => {
-    const button = document.createElement("button");
-    button.className = "answer-btn";
-    button.type = "button";
-    button.textContent = answer;
-    button.addEventListener("click", () => chooseAnswer(button, answer));
-    els.answerGrid.appendChild(button);
-  });
-}
+      function showHint() {
+        const q = state.unit.questions[state.index];
+        el.feedback.className = "feedback try";
+        el.feedback.textContent = `提示方塊：${q.hint}`;
+      }
 
-function chooseAnswer(button, answer) {
-  if (state.answered) return;
-  const question = state.currentUnit.questions[state.currentIndex];
-  const right = answer === question.correct;
-  button.classList.add(right ? "is-right" : "is-wrong");
+      function nextTask() {
+        if (state.index < state.unit.questions.length - 1) {
+          state.index += 1;
+          renderTask();
+          return;
+        }
+        if (units.every((unit) => (state.progress[unit.id] || 0) >= unit.questions.length)) finish();
+        else show("intro");
+      }
 
-  if (right) {
-    state.answered = true;
-    state.stars += 1;
-    els.feedback.className = "feedback good";
-    els.feedback.textContent = "答對了，這個地方又亮一點了。";
-    els.nextBtn.hidden = false;
-    [...els.answerGrid.children].forEach((child) => {
-      child.disabled = true;
-      if (child.textContent === question.correct) child.classList.add("is-right");
-    });
-    updateUnitProgress();
-  } else {
-    els.feedback.className = "feedback try";
-    els.feedback.textContent = `再試一次：${question.hint}`;
-    state.mistakes.push({
-      unitId: state.currentUnit.id,
-      questionIndex: state.currentIndex
-    });
-    button.disabled = true;
-  }
+      function finish() {
+        const mistakes = new Set(state.mistakes.map((item) => `${item.unitId}-${item.index}`)).size;
+        el.doneText.textContent = `你收集了 ${Object.values(state.materials).reduce((sum, value) => sum + value, 0)} 個材料、拿到 ${state.stars} 顆能量星，點亮 5 個救援點。錯題本裡有 ${mistakes} 題可以再練。`;
+        show("done");
+      }
 
-  renderStats();
-}
+      function reviewMistake() {
+        const first = state.mistakes[0];
+        if (!first) {
+          el.doneText.textContent = "目前沒有錯題。可以重新挑戰，試著一次修好整座島。";
+          return;
+        }
+        state.unit = units.find((unit) => unit.id === first.unitId);
+        state.index = first.index;
+        renderTask();
+        show("task");
+      }
 
-function updateUnitProgress() {
-  const unitId = state.currentUnit.id;
-  const nextDone = Math.max(state.progress[unitId] || 0, state.currentIndex + 1);
-  state.progress[unitId] = nextDone;
-  renderTown();
-}
+      function resetGame() {
+        state.unit = null;
+        state.index = 0;
+        state.answered = false;
+        state.stars = 0;
+        state.progress = {};
+        state.materials = { wood: 0, stone: 0, leaf: 0, crystal: 0 };
+        state.mistakes = [];
+        localStorage.removeItem("saveBlockWorldGame");
+        drawMap();
+        renderHud();
+        show("intro");
+      }
 
-function nextQuestion() {
-  const unit = state.currentUnit;
-  if (state.currentIndex < unit.questions.length - 1) {
-    state.currentIndex += 1;
-    renderQuestion();
-    return;
-  }
+      function speakQuestion() {
+        if (!("speechSynthesis" in window)) {
+          el.feedback.className = "feedback try";
+          el.feedback.textContent = "這台裝置目前不支援朗讀。";
+          return;
+        }
+        window.speechSynthesis.cancel();
+        const speech = new SpeechSynthesisUtterance(el.question.textContent);
+        speech.lang = "zh-TW";
+        speech.rate = 0.88;
+        window.speechSynthesis.speak(speech);
+      }
 
-  const allDone = units.every((item) => (state.progress[item.id] || 0) >= item.questions.length);
-  if (allDone) {
-    finishGame();
-  } else {
-    showScreen("start");
-  }
-}
+      function materialName(type) {
+        return { wood: "木塊", stone: "石塊", leaf: "葉塊", crystal: "晶塊" }[type];
+      }
 
-function showHint() {
-  const question = state.currentUnit.questions[state.currentIndex];
-  els.feedback.className = "feedback try";
-  els.feedback.textContent = question.hint;
-}
+      function visual(code) {
+        const [type, value] = code.split(":");
+        if (type === "wood" || type === "stone" || type === "leaf" || type === "crystal") {
+          return blockGrid(Number(value), type);
+        }
+        if (type === "ruler") {
+          return `<div class="mission-grid">${Array.from({ length: Number(value) }, (_, i) => `<span class="mini-block" style="background:#f0c65f;color:#59401f">${i + 1}m</span>`).join("")}</div>`;
+        }
+        if (type === "shape") {
+          const labels = {
+            roll: ["球", "盒", "柱", "方"],
+            cube: ["方", "方", "方", "方"],
+            solid: ["長", "方", "球", "柱"],
+            sort: ["食", "文", "筆", "本"],
+            box: ["鞋", "盒", "球", "幣"]
+          }[value];
+          return `<div class="mission-grid">${labels.map((label, i) => `<span class="mini-block" style="background:${["#4a9aa0", "#557fd0", "#c4834e", "#cf6753"][i % 4]}">${label}</span>`).join("")}</div>`;
+        }
+        if (type === "share") {
+          return blockGrid(Math.min(Number(value), 18), "wood");
+        }
+        if (type === "fraction") {
+          const [top, bottom] = value.split("/").map(Number);
+          return `<div class="mission-grid">${Array.from({ length: bottom }, (_, i) => `<span class="mini-block ${i < top ? "" : "dim"}" style="background:#557fd0">${i < top ? "亮" : ""}</span>`).join("")}</div>`;
+        }
+        return "";
+      }
 
-function readQuestion() {
-  if (!("speechSynthesis" in window)) {
-    els.feedback.className = "feedback try";
-    els.feedback.textContent = "這台裝置目前不能朗讀，但你可以慢慢看題目。";
-    return;
-  }
-  window.speechSynthesis.cancel();
-  const utterance = new SpeechSynthesisUtterance(els.questionText.textContent);
-  utterance.lang = "zh-TW";
-  utterance.rate = 0.88;
-  window.speechSynthesis.speak(utterance);
-}
+      function blockGrid(count, type) {
+        const color = { wood: "#b8834e", stone: "#778795", leaf: "#3f8f5c", crystal: "#5f85d7" }[type];
+        return `<div class="mission-grid">${Array.from({ length: count }, () => `<span class="mini-block" style="background:${color}"></span>`).join("")}</div>`;
+      }
 
-function finishGame() {
-  const uniqueMistakes = new Set(state.mistakes.map((item) => `${item.unitId}-${item.questionIndex}`)).size;
-  els.finishText.textContent = `你拿到 ${state.stars} 顆星星，修好 5 個地方。錯題本裡有 ${uniqueMistakes} 題可以再練一次。`;
-  showScreen("finish");
-}
+      function shuffle(items) {
+        return items
+          .map((value) => ({ value, sort: Math.random() }))
+          .sort((a, b) => a.sort - b.sort)
+          .map((item) => item.value);
+      }
 
-function startReview() {
-  const first = state.mistakes[0];
-  if (!first) {
-    els.finishText.textContent = "目前沒有錯題，可以直接再玩一次挑戰滿星。";
-    return;
-  }
-  state.currentUnit = units.find((unit) => unit.id === first.unitId);
-  state.currentIndex = first.questionIndex;
-  renderQuestion();
-  showScreen("unit");
-}
+      function save() {
+        localStorage.setItem("saveBlockWorldGame", JSON.stringify({
+          stars: state.stars,
+          progress: state.progress,
+          materials: state.materials,
+          mistakes: state.mistakes
+        }));
+      }
 
-function resetGame() {
-  state.currentUnit = null;
-  state.currentIndex = 0;
-  state.answered = false;
-  state.stars = 0;
-  state.mistakes = [];
-  state.progress = {};
-  localStorage.removeItem("finalTownGame");
-  renderTown();
-  renderStats();
-  showScreen("start");
-}
-
-function saveGame() {
-  localStorage.setItem("finalTownGame", JSON.stringify({
-    stars: state.stars,
-    mistakes: state.mistakes,
-    progress: state.progress
-  }));
-}
-
-function loadGame() {
-  try {
-    const saved = JSON.parse(localStorage.getItem("finalTownGame"));
-    if (!saved) return;
-    state.stars = saved.stars || 0;
-    state.mistakes = saved.mistakes || [];
-    state.progress = saved.progress || {};
-  } catch {
-    localStorage.removeItem("finalTownGame");
-  }
-}
-
-function shuffle(items) {
-  return items
-    .map((value) => ({ value, sort: Math.random() }))
-    .sort((a, b) => a.sort - b.sort)
-    .map((item) => item.value);
-}
-
-function visualHTML(code) {
-  const [type, raw] = code.split(":");
-  if (type === "coins") return repeatScene(Number(raw), "coin", "$");
-  if (type === "cubes") return repeatScene(Number(raw), "cube", "");
-  if (type === "snacks") return repeatScene(Number(raw), "snack", "");
-  if (type === "ruler") {
-    const count = Number(raw);
-    return `<div class="scene"><div class="ruler">${Array.from({ length: count }, (_, index) => `<span class="ruler-block">${index + 1}</span>`).join("")}</div></div>`;
-  }
-  if (type === "pizza") {
-    const [top, bottom] = raw.split("/").map(Number);
-    return `<div class="scene"><div class="pizza">${Array.from({ length: bottom }, (_, index) => `<span class="pizza-piece" style="opacity:${index < top ? 1 : 0.28}">${index < top ? "" : ""}</span>`).join("")}</div></div>`;
-  }
-  return `<div class="scene"></div>`;
-}
-
-function repeatScene(count, className, label) {
-  return `<div class="scene">${Array.from({ length: count }, () => `<span class="${className}">${label}</span>`).join("")}</div>`;
-}
-
-</script>
+      function load() {
+        try {
+          const saved = JSON.parse(localStorage.getItem("saveBlockWorldGame"));
+          if (!saved) return;
+          state.stars = saved.stars || 0;
+          state.progress = saved.progress || {};
+          state.materials = saved.materials || { wood: 0, stone: 0, leaf: 0, crystal: 0 };
+          state.mistakes = saved.mistakes || [];
+        } catch {
+          localStorage.removeItem("saveBlockWorldGame");
+        }
+      }
+    </script>
   </body>
 </html>
