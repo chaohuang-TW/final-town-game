@@ -77,7 +77,7 @@
 
       .hud {
         display: grid;
-        grid-template-columns: repeat(3, minmax(74px, 1fr));
+        grid-template-columns: repeat(4, minmax(74px, 1fr));
         gap: 9px;
       }
 
@@ -344,6 +344,88 @@
         color: var(--muted);
         font-weight: 800;
         line-height: 1.5;
+      }
+
+      .core-panel {
+        position: relative;
+        z-index: 1;
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 12px;
+        align-items: center;
+        margin-top: 14px;
+        padding: 12px;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.85);
+        border: 2px solid rgba(32, 49, 58, 0.08);
+      }
+
+      .core-orb {
+        display: grid;
+        place-items: center;
+        width: 58px;
+        height: 58px;
+        border-radius: 8px;
+        color: #705015;
+        background: #d9dde2;
+        box-shadow: inset 0 8px rgba(255, 255, 255, 0.28), inset 0 -10px rgba(0, 0, 0, 0.12);
+        font-size: 1.6rem;
+        font-weight: 900;
+        transition: background 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+      }
+
+      .core-orb.lit {
+        background: #f3c45e;
+        box-shadow:
+          0 0 22px rgba(255, 222, 92, 0.9),
+          inset 0 8px rgba(255, 255, 255, 0.32),
+          inset 0 -10px rgba(0, 0, 0, 0.1);
+      }
+
+      .core-panel strong {
+        display: block;
+        margin-bottom: 6px;
+      }
+
+      .core-meter {
+        height: 12px;
+        border-radius: 999px;
+        background: #e4edf1;
+        overflow: hidden;
+      }
+
+      .core-meter i {
+        display: block;
+        width: 0;
+        height: 100%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, #66a95c, #f0b84f);
+        transition: width 220ms ease;
+      }
+
+      .rescue-log {
+        position: relative;
+        z-index: 1;
+        margin-top: 10px;
+        padding: 12px 14px;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.85);
+        border: 2px solid rgba(32, 49, 58, 0.08);
+      }
+
+      .rescue-log strong {
+        display: block;
+        margin-bottom: 8px;
+      }
+
+      .rescue-log ul {
+        display: grid;
+        gap: 6px;
+        margin: 0;
+        padding-left: 1.15rem;
+        color: var(--muted);
+        font-weight: 800;
+        line-height: 1.4;
       }
 
       .console {
@@ -647,6 +729,7 @@
 
         .hud {
           width: 100%;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
         }
 
         .block-map {
@@ -679,6 +762,7 @@
           <div class="hud-card"><strong id="starCount">0</strong><span>能量星</span></div>
           <div class="hud-card"><strong id="buildCount">0/5</strong><span>救援點</span></div>
           <div class="hud-card"><strong id="materialCount">0</strong><span>材料</span></div>
+          <div class="hud-card"><strong id="streakCount">0</strong><span>連擊</span></div>
         </div>
       </header>
 
@@ -693,7 +777,18 @@
             <div class="slot"><span class="sample-block leaf"></span><span>葉塊 <b id="leafCount">0</b></span></div>
             <div class="slot"><span class="sample-block crystal"></span><span>晶塊 <b id="crystalCount">0</b></span></div>
           </div>
+          <div class="core-panel" aria-label="世界核心亮度">
+            <div id="coreOrb" class="core-orb" aria-hidden="true">芯</div>
+            <div>
+              <strong id="coreTitle">世界核心：沉睡中</strong>
+              <div class="core-meter"><i id="coreMeter"></i></div>
+            </div>
+          </div>
           <p class="legend">點地圖上的彩色方塊接任務。答對會取得材料，材料會自動點亮橋、塔、倉庫、廚房和花園。</p>
+          <div class="rescue-log">
+            <strong>救援日誌</strong>
+            <ul id="rescueLog"></ul>
+          </div>
         </section>
 
         <section class="console" aria-label="任務面板">
@@ -705,7 +800,7 @@
               <span class="chip">複習</span>
             </div>
             <h2>方塊世界的核心熄滅了</h2>
-            <p>你是方塊守護員。完成數學任務可以取得材料，把五個救援點一個一個點亮。答錯不用怕，系統會給你提示方塊。</p>
+            <p>你是方塊守護員。完成數學任務可以取得材料，把五個救援點一個一個點亮。連續答對會觸發連擊獎勵，世界核心也會越來越亮。</p>
             <div class="actions">
               <button id="startBtn" class="primary" type="button">開始救援</button>
               <button id="resetBtn" class="secondary" type="button">重新開始</button>
@@ -843,9 +938,12 @@
         index: 0,
         answered: false,
         stars: 0,
+        streak: 0,
+        bestStreak: 0,
         progress: {},
         materials: { wood: 0, stone: 0, leaf: 0, crystal: 0 },
-        mistakes: []
+        mistakes: [],
+        logs: ["世界核心正在等待第一道能量。"]
       };
 
       const el = {
@@ -856,10 +954,15 @@
         starCount: document.querySelector("#starCount"),
         buildCount: document.querySelector("#buildCount"),
         materialCount: document.querySelector("#materialCount"),
+        streakCount: document.querySelector("#streakCount"),
         woodCount: document.querySelector("#woodCount"),
         stoneCount: document.querySelector("#stoneCount"),
         leafCount: document.querySelector("#leafCount"),
         crystalCount: document.querySelector("#crystalCount"),
+        coreOrb: document.querySelector("#coreOrb"),
+        coreTitle: document.querySelector("#coreTitle"),
+        coreMeter: document.querySelector("#coreMeter"),
+        rescueLog: document.querySelector("#rescueLog"),
         unitTopic: document.querySelector("#unitTopic"),
         unitTitle: document.querySelector("#unitTitle"),
         progressText: document.querySelector("#progressText"),
@@ -950,13 +1053,20 @@
       function renderHud() {
         const complete = units.filter((unit) => (state.progress[unit.id] || 0) >= unit.questions.length).length;
         const totalMaterials = Object.values(state.materials).reduce((sum, value) => sum + value, 0);
+        const totalProgress = units.reduce((sum, unit) => sum + (state.progress[unit.id] || 0), 0);
+        const corePercent = Math.round((totalProgress / 30) * 100);
         el.starCount.textContent = state.stars;
         el.buildCount.textContent = `${complete}/5`;
         el.materialCount.textContent = totalMaterials;
+        el.streakCount.textContent = state.streak;
         el.woodCount.textContent = state.materials.wood;
         el.stoneCount.textContent = state.materials.stone;
         el.leafCount.textContent = state.materials.leaf;
         el.crystalCount.textContent = state.materials.crystal;
+        el.coreMeter.style.width = `${corePercent}%`;
+        el.coreOrb.classList.toggle("lit", corePercent > 0);
+        el.coreTitle.textContent = `世界核心：${coreLabel(corePercent)} ${corePercent}%`;
+        el.rescueLog.innerHTML = state.logs.slice(0, 4).map((log) => `<li>${log}</li>`).join("");
         save();
       }
 
@@ -1005,11 +1115,17 @@
         button.classList.add(correct ? "good" : "bad");
         if (correct) {
           state.answered = true;
-          state.stars += 1;
+          state.streak += 1;
+          state.bestStreak = Math.max(state.bestStreak, state.streak);
+          const bonus = state.streak > 0 && state.streak % 3 === 0;
+          state.stars += bonus ? 2 : 1;
           state.materials[state.unit.material] += 1;
           state.progress[state.unit.id] = Math.max(state.progress[state.unit.id] || 0, state.index + 1);
           el.feedback.className = "feedback good";
-          el.feedback.textContent = `答對了，取得 1 個${materialName(state.unit.material)}，救援進度增加。`;
+          el.feedback.textContent = bonus
+            ? `連擊 ${state.streak}！取得 1 個${materialName(state.unit.material)}和 2 顆能量星，世界核心閃了一下。`
+            : `答對了，取得 1 個${materialName(state.unit.material)}，救援進度增加。`;
+          addLog(bonus ? `連擊 ${state.streak} 達成，${state.unit.title}送出額外能量星。` : `${state.unit.title}亮起一格，取得${materialName(state.unit.material)}。`);
           el.nextBtn.hidden = false;
           [...el.answers.children].forEach((child) => {
             child.disabled = true;
@@ -1017,9 +1133,11 @@
           });
           drawMap();
         } else {
+          state.streak = 0;
           el.feedback.className = "feedback try";
           el.feedback.textContent = `提示方塊：${q.hint}`;
           state.mistakes.push({ unitId: state.unit.id, index: state.index });
+          addLog(`${state.unit.title}出現提示方塊，換個方法再試一次。`);
           button.disabled = true;
         }
         renderHud();
@@ -1043,7 +1161,7 @@
 
       function finish() {
         const mistakes = new Set(state.mistakes.map((item) => `${item.unitId}-${item.index}`)).size;
-        el.doneText.textContent = `你收集了 ${Object.values(state.materials).reduce((sum, value) => sum + value, 0)} 個材料、拿到 ${state.stars} 顆能量星，點亮 5 個救援點。錯題本裡有 ${mistakes} 題可以再練。`;
+        el.doneText.textContent = `你收集了 ${Object.values(state.materials).reduce((sum, value) => sum + value, 0)} 個材料、拿到 ${state.stars} 顆能量星，最高連擊 ${state.bestStreak}，點亮 5 個救援點。錯題本裡有 ${mistakes} 題可以再練。`;
         show("done");
       }
 
@@ -1064,9 +1182,12 @@
         state.index = 0;
         state.answered = false;
         state.stars = 0;
+        state.streak = 0;
+        state.bestStreak = 0;
         state.progress = {};
         state.materials = { wood: 0, stone: 0, leaf: 0, crystal: 0 };
         state.mistakes = [];
+        state.logs = ["世界核心正在等待第一道能量。"];
         localStorage.removeItem("saveBlockWorldGame");
         drawMap();
         renderHud();
@@ -1088,6 +1209,18 @@
 
       function materialName(type) {
         return { wood: "木塊", stone: "石塊", leaf: "葉塊", crystal: "晶塊" }[type];
+      }
+
+      function coreLabel(percent) {
+        if (percent >= 100) return "完全點亮";
+        if (percent >= 70) return "強光啟動";
+        if (percent >= 40) return "穩定發光";
+        if (percent > 0) return "微光恢復";
+        return "沉睡中";
+      }
+
+      function addLog(message) {
+        state.logs = [message, ...state.logs.filter((item) => item !== message)].slice(0, 6);
       }
 
       function visual(code) {
@@ -1133,9 +1266,12 @@
       function save() {
         localStorage.setItem("saveBlockWorldGame", JSON.stringify({
           stars: state.stars,
+          streak: state.streak,
+          bestStreak: state.bestStreak,
           progress: state.progress,
           materials: state.materials,
-          mistakes: state.mistakes
+          mistakes: state.mistakes,
+          logs: state.logs
         }));
       }
 
@@ -1144,9 +1280,12 @@
           const saved = JSON.parse(localStorage.getItem("saveBlockWorldGame"));
           if (!saved) return;
           state.stars = saved.stars || 0;
+          state.streak = saved.streak || 0;
+          state.bestStreak = saved.bestStreak || 0;
           state.progress = saved.progress || {};
           state.materials = saved.materials || { wood: 0, stone: 0, leaf: 0, crystal: 0 };
           state.mistakes = saved.mistakes || [];
+          state.logs = saved.logs || ["世界核心正在等待第一道能量。"];
         } catch {
           localStorage.removeItem("saveBlockWorldGame");
         }
