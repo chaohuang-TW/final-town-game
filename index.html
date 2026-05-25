@@ -1,0 +1,1075 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>期末任務小鎮</title>
+    <style>
+:root {
+  color-scheme: light;
+  --ink: #21303a;
+  --muted: #687783;
+  --paper: #fffaf0;
+  --panel: #ffffff;
+  --line: #d9e1e6;
+  --green: #4f9b63;
+  --blue: #3d7fb6;
+  --red: #d95b50;
+  --yellow: #f3b64b;
+  --teal: #4ca6a8;
+  --shadow: 0 18px 45px rgba(48, 65, 76, 0.16);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", system-ui, sans-serif;
+  color: var(--ink);
+  background:
+    linear-gradient(180deg, rgba(224, 243, 255, 0.88), rgba(255, 247, 225, 0.92)),
+    repeating-linear-gradient(90deg, rgba(79, 155, 99, 0.08) 0 32px, transparent 32px 64px);
+}
+
+button {
+  font: inherit;
+}
+
+.app-shell {
+  width: min(1180px, calc(100vw - 32px));
+  margin: 0 auto;
+  padding: 24px 0;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.eyebrow {
+  margin: 0 0 6px;
+  color: var(--blue);
+  font-size: 0.86rem;
+  font-weight: 800;
+}
+
+h1,
+h2,
+p {
+  margin-top: 0;
+}
+
+h1 {
+  margin-bottom: 0;
+  font-size: clamp(2rem, 5vw, 3.4rem);
+}
+
+h2 {
+  margin-bottom: 12px;
+  font-size: 1.65rem;
+}
+
+.stats {
+  display: flex;
+  gap: 10px;
+}
+
+.stat {
+  min-width: 82px;
+  padding: 10px 12px;
+  border: 2px solid rgba(33, 48, 58, 0.1);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.78);
+  text-align: center;
+}
+
+.stat span {
+  display: block;
+  font-size: 1.45rem;
+  font-weight: 900;
+}
+
+.stat small {
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.game-grid {
+  display: grid;
+  grid-template-columns: minmax(320px, 1.05fr) minmax(340px, 0.95fr);
+  gap: 18px;
+  align-items: stretch;
+}
+
+.town-panel,
+.play-panel {
+  min-height: 650px;
+  border: 2px solid rgba(33, 48, 58, 0.08);
+  border-radius: 8px;
+  background: var(--panel);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.town-panel {
+  position: relative;
+  background:
+    linear-gradient(180deg, #aee2f5 0 34%, #97d47d 34% 100%);
+}
+
+.sky {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 42%;
+}
+
+.cloud {
+  position: absolute;
+  width: 98px;
+  height: 34px;
+  border-radius: 30px;
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.cloud::before,
+.cloud::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  background: inherit;
+}
+
+.cloud::before {
+  width: 42px;
+  height: 42px;
+  left: 14px;
+  top: -18px;
+}
+
+.cloud::after {
+  width: 52px;
+  height: 52px;
+  right: 12px;
+  top: -26px;
+}
+
+.cloud-a {
+  left: 9%;
+  top: 12%;
+}
+
+.cloud-b {
+  right: 12%;
+  top: 22%;
+  transform: scale(0.78);
+}
+
+.town-map {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  height: 100%;
+  padding: 170px 28px 34px;
+}
+
+.town-path {
+  position: absolute;
+  left: 50%;
+  bottom: -28px;
+  width: 210px;
+  height: 390px;
+  border-radius: 50% 50% 0 0;
+  background: rgba(224, 190, 122, 0.76);
+  transform: translateX(-50%);
+}
+
+.building {
+  position: relative;
+  display: flex;
+  min-height: 156px;
+  padding: 14px;
+  border: 3px solid rgba(33, 48, 58, 0.15);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.82);
+  cursor: pointer;
+  transition: transform 160ms ease, filter 160ms ease, background 160ms ease;
+}
+
+.building:hover,
+.building:focus-visible {
+  transform: translateY(-3px);
+  outline: 0;
+}
+
+.building.is-locked {
+  filter: saturate(0.45);
+}
+
+.building.is-complete {
+  background: #fff8d7;
+  border-color: rgba(243, 182, 75, 0.72);
+}
+
+.building-art {
+  width: 86px;
+  min-width: 86px;
+  height: 94px;
+  align-self: flex-end;
+  border: 4px solid rgba(33, 48, 58, 0.18);
+  border-bottom-width: 8px;
+  border-radius: 8px 8px 4px 4px;
+  background: var(--unit-color);
+  box-shadow: inset 0 -18px rgba(0, 0, 0, 0.08);
+}
+
+.building-art::before {
+  content: "";
+  position: absolute;
+  width: 54px;
+  height: 28px;
+  left: 30px;
+  top: 38px;
+  border-radius: 8px 8px 0 0;
+  background: color-mix(in srgb, var(--unit-color), white 42%);
+}
+
+.building-info {
+  min-width: 0;
+  padding-left: 12px;
+}
+
+.building-info strong {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 1.05rem;
+}
+
+.building-info span {
+  display: block;
+  color: var(--muted);
+  line-height: 1.35;
+}
+
+.building-progress {
+  position: absolute;
+  right: 12px;
+  bottom: 10px;
+  color: var(--blue);
+  font-weight: 900;
+}
+
+.play-panel {
+  position: relative;
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.screen {
+  display: none;
+  height: 100%;
+  padding: 28px;
+}
+
+.screen.is-active {
+  display: flex;
+  flex-direction: column;
+}
+
+#startScreen,
+#finishScreen {
+  justify-content: center;
+}
+
+#startScreen p,
+#finishScreen p {
+  color: var(--muted);
+  font-size: 1.08rem;
+  line-height: 1.75;
+}
+
+.badge-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.badge {
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: #edf5f0;
+  color: #346c45;
+  font-weight: 900;
+}
+
+.start-actions,
+.task-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+}
+
+.primary-btn,
+.ghost-btn,
+.icon-btn {
+  min-height: 46px;
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 900;
+}
+
+.primary-btn {
+  padding: 0 18px;
+  color: #fff;
+  background: var(--green);
+}
+
+.ghost-btn {
+  padding: 0 18px;
+  color: var(--ink);
+  background: #edf3f6;
+}
+
+.icon-btn {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  min-width: 46px;
+  color: var(--ink);
+  background: #edf3f6;
+  font-size: 1.5rem;
+}
+
+.unit-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.unit-header > div {
+  flex: 1;
+  min-width: 0;
+}
+
+.unit-header h2 {
+  margin-bottom: 0;
+}
+
+.progress-line {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 18px;
+  color: var(--muted);
+  font-weight: 900;
+}
+
+.meter {
+  height: 12px;
+  border-radius: 999px;
+  background: #e6edf1;
+  overflow: hidden;
+}
+
+.meter i {
+  display: block;
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--yellow);
+  transition: width 220ms ease;
+}
+
+.visual-box {
+  display: grid;
+  place-items: center;
+  min-height: 170px;
+  margin-bottom: 18px;
+  border: 2px dashed #c8d6dd;
+  border-radius: 8px;
+  background: #f8fbfc;
+  overflow: hidden;
+}
+
+.scene {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  width: 100%;
+  padding: 20px;
+}
+
+.coin,
+.cube,
+.snack,
+.pizza-piece,
+.ruler-block {
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-weight: 900;
+}
+
+.coin {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #d9a139;
+  border: 4px solid #f2ce72;
+}
+
+.cube {
+  width: 52px;
+  height: 52px;
+  border-radius: 8px;
+  background: #4ca6a8;
+  box-shadow: inset -10px -10px rgba(0, 0, 0, 0.08);
+}
+
+.snack {
+  width: 38px;
+  height: 38px;
+  border-radius: 50% 50% 46% 46%;
+  background: #d95b50;
+}
+
+.pizza {
+  display: grid;
+  grid-template-columns: repeat(4, 52px);
+  gap: 5px;
+}
+
+.pizza-piece {
+  height: 44px;
+  border-radius: 8px;
+  background: #f0b44c;
+  color: #7b461d;
+}
+
+.ruler {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  padding: 14px;
+  border-radius: 8px;
+  background: #f7df96;
+}
+
+.ruler-block {
+  width: 30px;
+  height: 48px;
+  color: #31404a;
+  background: rgba(255, 255, 255, 0.45);
+  border-right: 2px solid rgba(49, 64, 74, 0.24);
+}
+
+.question-text {
+  min-height: 76px;
+  font-size: 1.35rem;
+  font-weight: 900;
+  line-height: 1.55;
+}
+
+.answer-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.answer-btn {
+  min-height: 62px;
+  padding: 12px;
+  border: 2px solid #d8e2e7;
+  border-radius: 8px;
+  background: #fff;
+  color: var(--ink);
+  cursor: pointer;
+  font-size: 1.1rem;
+  font-weight: 900;
+}
+
+.answer-btn:hover,
+.answer-btn:focus-visible {
+  border-color: var(--blue);
+  outline: 0;
+}
+
+.answer-btn.is-right {
+  border-color: var(--green);
+  background: #eaf6ed;
+}
+
+.answer-btn.is-wrong {
+  border-color: var(--red);
+  background: #fff0ee;
+}
+
+.feedback {
+  min-height: 58px;
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: #f1f6f8;
+  color: var(--muted);
+  line-height: 1.45;
+  font-weight: 800;
+}
+
+.feedback.good {
+  background: #eaf6ed;
+  color: #346c45;
+}
+
+.feedback.try {
+  background: #fff3e6;
+  color: #85531f;
+}
+
+.finish-medal {
+  display: grid;
+  place-items: center;
+  width: 86px;
+  height: 86px;
+  margin-bottom: 18px;
+  border-radius: 50%;
+  color: #8a5a16;
+  background: #f6cc68;
+  font-size: 2.6rem;
+  font-weight: 900;
+}
+
+@media (max-width: 900px) {
+  .app-shell {
+    width: min(100vw - 18px, 680px);
+    padding: 12px 0;
+  }
+
+  .topbar {
+    align-items: flex-start;
+  }
+
+  .game-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .town-panel,
+  .play-panel {
+    min-height: auto;
+  }
+
+  .town-map {
+    min-height: 520px;
+    padding: 120px 14px 22px;
+    gap: 10px;
+  }
+
+  .building {
+    min-height: 142px;
+    padding: 10px;
+  }
+
+  .building-art {
+    width: 62px;
+    min-width: 62px;
+    height: 78px;
+  }
+
+  .building-art::before {
+    left: 23px;
+    top: 35px;
+    width: 38px;
+  }
+
+  .screen {
+    padding: 20px;
+  }
+
+  .answer-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 540px) {
+  .topbar {
+    flex-direction: column;
+  }
+
+  .town-map {
+    grid-template-columns: 1fr;
+    min-height: 760px;
+  }
+
+  .building {
+    min-height: 120px;
+  }
+
+  .question-text {
+    font-size: 1.15rem;
+  }
+}
+
+</style>
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">康軒二下數學期末複習</p>
+          <h1>期末任務小鎮</h1>
+        </div>
+        <div class="stats" aria-label="遊戲進度">
+          <div class="stat">
+            <span id="starCount">0</span>
+            <small>星星</small>
+          </div>
+          <div class="stat">
+            <span id="fixedCount">0/5</span>
+            <small>修復</small>
+          </div>
+        </div>
+      </header>
+
+      <main class="game-grid">
+        <section class="town-panel" aria-label="小鎮地圖">
+          <div class="sky">
+            <span class="cloud cloud-a"></span>
+            <span class="cloud cloud-b"></span>
+          </div>
+          <div id="townMap" class="town-map"></div>
+          <div class="town-path" aria-hidden="true"></div>
+        </section>
+
+        <section class="play-panel">
+          <div id="startScreen" class="screen is-active">
+            <div class="badge-row" aria-hidden="true">
+              <span class="badge">算一算</span>
+              <span class="badge">量一量</span>
+              <span class="badge">分一分</span>
+            </div>
+            <h2>幫小鎮完成期末準備</h2>
+            <p>
+              每個地方都有 6 個小任務。答對會點亮建築，答錯會拿到提示，
+              全部完成後，小鎮就會準備好迎接期末日。
+            </p>
+            <div class="start-actions">
+              <button id="startBtn" class="primary-btn" type="button">開始任務</button>
+              <button id="resetBtn" class="ghost-btn" type="button">重新開始</button>
+            </div>
+          </div>
+
+          <div id="unitScreen" class="screen">
+            <div class="unit-header">
+              <button id="backBtn" class="icon-btn" type="button" aria-label="回到地圖">‹</button>
+              <div>
+                <p id="unitKicker" class="eyebrow">任務</p>
+                <h2 id="unitTitle">補給商店</h2>
+              </div>
+              <button id="readBtn" class="icon-btn" type="button" aria-label="朗讀題目">▶</button>
+            </div>
+
+            <div class="progress-line">
+              <span id="questionProgress"></span>
+              <div class="meter" aria-hidden="true">
+                <i id="unitMeter"></i>
+              </div>
+            </div>
+
+            <div id="visualBox" class="visual-box" aria-hidden="true"></div>
+            <p id="questionText" class="question-text"></p>
+            <div id="answerGrid" class="answer-grid"></div>
+
+            <div id="feedback" class="feedback" role="status"></div>
+
+            <div class="task-actions">
+              <button id="hintBtn" class="ghost-btn" type="button">看提示</button>
+              <button id="nextBtn" class="primary-btn" type="button" hidden>下一題</button>
+            </div>
+          </div>
+
+          <div id="finishScreen" class="screen">
+            <div class="finish-medal" aria-hidden="true">★</div>
+            <h2>小鎮準備好了</h2>
+            <p id="finishText"></p>
+            <div class="start-actions">
+              <button id="reviewBtn" class="primary-btn" type="button">練習錯題</button>
+              <button id="playAgainBtn" class="ghost-btn" type="button">再玩一次</button>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script>
+const units = [
+  {
+    id: "shop",
+    title: "補給商店",
+    topic: "兩步驟應用問題",
+    color: "#f1a34c",
+    intro: "先看清楚做了哪兩件事，再一步一步算。",
+    questions: [
+      q("小安有 4 盒鉛筆，每盒 3 枝，又多買 2 枝。現在共有幾枝？", ["14 枝", "12 枝", "9 枝", "17 枝"], "14 枝", "先算 4 盒共有 4×3，再加 2。", "coins:4"),
+      q("一包貼紙有 5 張，老師買 3 包，送給學生 4 張後，還剩幾張？", ["11 張", "15 張", "9 張", "19 張"], "11 張", "先算 3 包共有 15 張，再減 4 張。", "snacks:5"),
+      q("桌上有 18 顆糖，先吃掉 6 顆，剩下的平均放進 3 個盒子，每盒幾顆？", ["4 顆", "6 顆", "8 顆", "12 顆"], "4 顆", "先算剩下 12 顆，再分成 3 盒。", "snacks:6"),
+      q("一排有 4 張椅子，排了 5 排，又搬走 3 張。還有幾張椅子？", ["17 張", "20 張", "12 張", "23 張"], "17 張", "先算 4×5，再減 3。", "cubes:5"),
+      q("小美有 30 元，買了 2 個 8 元的麵包，還剩幾元？", ["14 元", "16 元", "22 元", "12 元"], "14 元", "先算 2 個麵包 16 元，再用 30 減 16。", "coins:6"),
+      q("每袋有 6 顆球，2 袋再加上 5 顆，共有幾顆球？", ["17 顆", "12 顆", "13 顆", "22 顆"], "17 顆", "先算 2 袋是 12 顆，再加 5 顆。", "snacks:6")
+    ]
+  },
+  {
+    id: "yard",
+    title: "測量工地",
+    topic: "公尺和公分",
+    color: "#4f9b63",
+    intro: "1 公尺是 100 公分，長度加減要注意單位。",
+    questions: [
+      q("1 公尺 20 公分等於幾公分？", ["120 公分", "102 公分", "80 公分", "112 公分"], "120 公分", "1 公尺是 100 公分，100 加 20。", "ruler:4"),
+      q("150 公分等於幾公尺幾公分？", ["1 公尺 50 公分", "15 公尺", "1 公尺 5 公分", "50 公尺"], "1 公尺 50 公分", "100 公分可以換成 1 公尺。", "ruler:5"),
+      q("繩子長 2 公尺，剪掉 60 公分，還剩幾公分？", ["140 公分", "160 公分", "260 公分", "40 公分"], "140 公分", "2 公尺先換成 200 公分。", "ruler:6"),
+      q("鉛筆長 15 公分，橡皮擦長 5 公分，兩個接起來長幾公分？", ["20 公分", "10 公分", "25 公分", "15 公分"], "20 公分", "把兩段長度加起來。", "ruler:3"),
+      q("門高大約 2 公尺，下面哪一個最接近？", ["200 公分", "20 公分", "2 公分", "2000 公分"], "200 公分", "2 公尺就是 200 公分。", "ruler:5"),
+      q("彩帶長 90 公分，再接上 30 公分，共長幾公尺幾公分？", ["1 公尺 20 公分", "120 公尺", "12 公分", "1 公尺 2 公分"], "1 公尺 20 公分", "90 加 30 是 120 公分。", "ruler:4")
+    ]
+  },
+  {
+    id: "warehouse",
+    title: "積木倉庫",
+    topic: "分類與立體形體",
+    color: "#4ca6a8",
+    intro: "先找大分類，再看形狀、大小或特徵。",
+    questions: [
+      q("先用「會滾、不會滾」分類，球應該放在哪一類？", ["會滾", "不會滾", "兩類都不是", "要看顏色"], "會滾", "球的表面圓圓的，可以滾動。", "cubes:4"),
+      q("正方體每個面的形狀最像哪一種？", ["正方形", "長方形", "三角形", "圓形"], "正方形", "正方體的面都是一樣大的正方形。", "cubes:6"),
+      q("長方體和正方體最適合先放在哪個大分類？", ["立體形體", "平面圖形", "數字", "時間"], "立體形體", "可以拿起來、堆起來的是立體形體。", "cubes:5"),
+      q("要把書本、餅乾盒、積木再細分，可以用哪個特徵？", ["形狀", "今天星期幾", "誰先拿到", "聲音大小"], "形狀", "分類要看物品本身的共同特徵。", "cubes:5"),
+      q("下面哪一個比較像長方體？", ["鞋盒", "籃球", "盤子", "硬幣"], "鞋盒", "鞋盒有長方形的面，像長方體。", "cubes:3"),
+      q("先分成食物和文具，再把文具分成筆和本子，這叫什麼？", ["先大分類再小分類", "只看顏色", "只算數量", "不能分類"], "先大分類再小分類", "先分大類，再在同一類裡細分。", "cubes:4")
+    ]
+  },
+  {
+    id: "bakery",
+    title: "點心工坊",
+    topic: "分分看",
+    color: "#d95b50",
+    intro: "公平分就是每個人拿到一樣多。",
+    questions: [
+      q("12 顆餅乾平均分給 3 人，每人幾顆？", ["4 顆", "3 顆", "6 顆", "9 顆"], "4 顆", "想 3 個人每人 4 顆，剛好 12 顆。", "snacks:12"),
+      q("16 顆糖平均放進 4 個袋子，每袋幾顆？", ["4 顆", "8 顆", "12 顆", "2 顆"], "4 顆", "4、4、4、4 合起來是 16。", "snacks:10"),
+      q("10 個蘋果平均分給 5 人，每人幾個？", ["2 個", "5 個", "3 個", "1 個"], "2 個", "5 人每人 2 個，剛好 10 個。", "snacks:10"),
+      q("下面哪一種是平分？", ["每人 3 顆", "有人 4 顆有人 2 顆", "只給第一個人", "剩下不分"], "每人 3 顆", "平分要每一份都一樣多。", "snacks:6"),
+      q("18 張卡片平均分給 6 人，每人幾張？", ["3 張", "6 張", "12 張", "4 張"], "3 張", "6 個 3 是 18。", "snacks:9"),
+      q("14 顆珠子平均分成 2 份，每份幾顆？", ["7 顆", "6 顆", "8 顆", "12 顆"], "7 顆", "分成兩份一樣多，就是一半。", "snacks:8")
+    ]
+  },
+  {
+    id: "plaza",
+    title: "披薩廣場",
+    topic: "分數",
+    color: "#3d7fb6",
+    intro: "先看全部分成幾份，再看拿了幾份。",
+    questions: [
+      q("一個披薩平均分成 4 份，吃掉 1 份，是幾分之幾？", ["1/4", "1/2", "3/4", "4/1"], "1/4", "下面的數字 4 表示平均分成 4 份。", "pizza:1/4"),
+      q("一條巧克力平均分成 2 份，拿 1 份，是多少？", ["1/2", "1/4", "2/1", "2/2"], "1/2", "平均分成 2 份，拿 1 份。", "pizza:1/2"),
+      q("一個圓平均分成 3 份，塗 2 份，可以記成？", ["2/3", "1/3", "3/2", "3/3"], "2/3", "分母是總份數，分子是塗色份數。", "pizza:2/3"),
+      q("1/2 和 1/4 哪一個比較大？", ["1/2", "1/4", "一樣大", "不能比"], "1/2", "同一個東西平均分，分成 2 份的每份比較大。", "pizza:1/2"),
+      q("把一張紙平均分成 5 份，拿 3 份，是幾分之幾？", ["3/5", "5/3", "1/5", "2/5"], "3/5", "5 份中的 3 份，記成 3/5。", "pizza:3/5"),
+      q("4/4 表示什麼？", ["全部", "一半", "四分之一", "沒有"], "全部", "平均分成 4 份，拿了 4 份就是全部。", "pizza:4/4")
+    ]
+  }
+];
+
+const state = {
+  currentUnit: null,
+  currentIndex: 0,
+  answered: false,
+  stars: 0,
+  mistakes: [],
+  progress: {}
+};
+
+const els = {
+  townMap: document.querySelector("#townMap"),
+  startScreen: document.querySelector("#startScreen"),
+  unitScreen: document.querySelector("#unitScreen"),
+  finishScreen: document.querySelector("#finishScreen"),
+  starCount: document.querySelector("#starCount"),
+  fixedCount: document.querySelector("#fixedCount"),
+  unitKicker: document.querySelector("#unitKicker"),
+  unitTitle: document.querySelector("#unitTitle"),
+  questionProgress: document.querySelector("#questionProgress"),
+  unitMeter: document.querySelector("#unitMeter"),
+  visualBox: document.querySelector("#visualBox"),
+  questionText: document.querySelector("#questionText"),
+  answerGrid: document.querySelector("#answerGrid"),
+  feedback: document.querySelector("#feedback"),
+  nextBtn: document.querySelector("#nextBtn"),
+  hintBtn: document.querySelector("#hintBtn"),
+  finishText: document.querySelector("#finishText")
+};
+
+document.querySelector("#startBtn").addEventListener("click", startFirstTask);
+document.querySelector("#resetBtn").addEventListener("click", resetGame);
+document.querySelector("#backBtn").addEventListener("click", () => showScreen("start"));
+document.querySelector("#nextBtn").addEventListener("click", nextQuestion);
+document.querySelector("#hintBtn").addEventListener("click", showHint);
+document.querySelector("#readBtn").addEventListener("click", readQuestion);
+document.querySelector("#reviewBtn").addEventListener("click", startReview);
+document.querySelector("#playAgainBtn").addEventListener("click", resetGame);
+
+loadGame();
+renderTown();
+renderStats();
+
+function q(text, answers, correct, hint, visual) {
+  return { text, answers, correct, hint, visual };
+}
+
+function showScreen(name) {
+  els.startScreen.classList.toggle("is-active", name === "start");
+  els.unitScreen.classList.toggle("is-active", name === "unit");
+  els.finishScreen.classList.toggle("is-active", name === "finish");
+
+  if (name === "unit" && window.matchMedia("(max-width: 900px)").matches) {
+    requestAnimationFrame(() => {
+      els.unitScreen.scrollIntoView({ block: "start", behavior: "smooth" });
+    });
+  }
+}
+
+function renderTown() {
+  els.townMap.innerHTML = "";
+  units.forEach((unit) => {
+    const done = state.progress[unit.id] || 0;
+    const complete = done >= unit.questions.length;
+    const button = document.createElement("button");
+    button.className = `building ${complete ? "is-complete" : "is-locked"}`;
+    button.style.setProperty("--unit-color", unit.color);
+    button.type = "button";
+    button.innerHTML = `
+      <span class="building-art"></span>
+      <span class="building-info">
+        <strong>${unit.title}</strong>
+        <span>${unit.topic}</span>
+      </span>
+      <span class="building-progress">${done}/${unit.questions.length}</span>
+    `;
+    button.addEventListener("click", () => startUnit(unit.id));
+    els.townMap.appendChild(button);
+  });
+}
+
+function renderStats() {
+  const completeCount = units.filter((unit) => (state.progress[unit.id] || 0) >= unit.questions.length).length;
+  els.starCount.textContent = state.stars;
+  els.fixedCount.textContent = `${completeCount}/5`;
+  saveGame();
+}
+
+function startUnit(unitId) {
+  state.currentUnit = units.find((unit) => unit.id === unitId);
+  state.currentIndex = Math.min(state.progress[unitId] || 0, state.currentUnit.questions.length - 1);
+  renderQuestion();
+  showScreen("unit");
+}
+
+function startFirstTask() {
+  const unit = units.find((item) => (state.progress[item.id] || 0) < item.questions.length);
+  if (unit) {
+    startUnit(unit.id);
+    return;
+  }
+  finishGame();
+}
+
+function renderQuestion() {
+  const unit = state.currentUnit;
+  const question = unit.questions[state.currentIndex];
+  state.answered = false;
+  els.unitKicker.textContent = unit.topic;
+  els.unitTitle.textContent = unit.title;
+  els.questionProgress.textContent = `${state.currentIndex + 1}/${unit.questions.length}`;
+  els.unitMeter.style.width = `${(state.currentIndex / unit.questions.length) * 100}%`;
+  els.visualBox.innerHTML = visualHTML(question.visual);
+  els.questionText.textContent = question.text;
+  els.feedback.className = "feedback";
+  els.feedback.textContent = unit.intro;
+  els.nextBtn.hidden = true;
+  els.answerGrid.innerHTML = "";
+
+  shuffle([...question.answers]).forEach((answer) => {
+    const button = document.createElement("button");
+    button.className = "answer-btn";
+    button.type = "button";
+    button.textContent = answer;
+    button.addEventListener("click", () => chooseAnswer(button, answer));
+    els.answerGrid.appendChild(button);
+  });
+}
+
+function chooseAnswer(button, answer) {
+  if (state.answered) return;
+  const question = state.currentUnit.questions[state.currentIndex];
+  const right = answer === question.correct;
+  button.classList.add(right ? "is-right" : "is-wrong");
+
+  if (right) {
+    state.answered = true;
+    state.stars += 1;
+    els.feedback.className = "feedback good";
+    els.feedback.textContent = "答對了，這個地方又亮一點了。";
+    els.nextBtn.hidden = false;
+    [...els.answerGrid.children].forEach((child) => {
+      child.disabled = true;
+      if (child.textContent === question.correct) child.classList.add("is-right");
+    });
+    updateUnitProgress();
+  } else {
+    els.feedback.className = "feedback try";
+    els.feedback.textContent = `再試一次：${question.hint}`;
+    state.mistakes.push({
+      unitId: state.currentUnit.id,
+      questionIndex: state.currentIndex
+    });
+    button.disabled = true;
+  }
+
+  renderStats();
+}
+
+function updateUnitProgress() {
+  const unitId = state.currentUnit.id;
+  const nextDone = Math.max(state.progress[unitId] || 0, state.currentIndex + 1);
+  state.progress[unitId] = nextDone;
+  renderTown();
+}
+
+function nextQuestion() {
+  const unit = state.currentUnit;
+  if (state.currentIndex < unit.questions.length - 1) {
+    state.currentIndex += 1;
+    renderQuestion();
+    return;
+  }
+
+  const allDone = units.every((item) => (state.progress[item.id] || 0) >= item.questions.length);
+  if (allDone) {
+    finishGame();
+  } else {
+    showScreen("start");
+  }
+}
+
+function showHint() {
+  const question = state.currentUnit.questions[state.currentIndex];
+  els.feedback.className = "feedback try";
+  els.feedback.textContent = question.hint;
+}
+
+function readQuestion() {
+  if (!("speechSynthesis" in window)) {
+    els.feedback.className = "feedback try";
+    els.feedback.textContent = "這台裝置目前不能朗讀，但你可以慢慢看題目。";
+    return;
+  }
+  window.speechSynthesis.cancel();
+  const utterance = new SpeechSynthesisUtterance(els.questionText.textContent);
+  utterance.lang = "zh-TW";
+  utterance.rate = 0.88;
+  window.speechSynthesis.speak(utterance);
+}
+
+function finishGame() {
+  const uniqueMistakes = new Set(state.mistakes.map((item) => `${item.unitId}-${item.questionIndex}`)).size;
+  els.finishText.textContent = `你拿到 ${state.stars} 顆星星，修好 5 個地方。錯題本裡有 ${uniqueMistakes} 題可以再練一次。`;
+  showScreen("finish");
+}
+
+function startReview() {
+  const first = state.mistakes[0];
+  if (!first) {
+    els.finishText.textContent = "目前沒有錯題，可以直接再玩一次挑戰滿星。";
+    return;
+  }
+  state.currentUnit = units.find((unit) => unit.id === first.unitId);
+  state.currentIndex = first.questionIndex;
+  renderQuestion();
+  showScreen("unit");
+}
+
+function resetGame() {
+  state.currentUnit = null;
+  state.currentIndex = 0;
+  state.answered = false;
+  state.stars = 0;
+  state.mistakes = [];
+  state.progress = {};
+  localStorage.removeItem("finalTownGame");
+  renderTown();
+  renderStats();
+  showScreen("start");
+}
+
+function saveGame() {
+  localStorage.setItem("finalTownGame", JSON.stringify({
+    stars: state.stars,
+    mistakes: state.mistakes,
+    progress: state.progress
+  }));
+}
+
+function loadGame() {
+  try {
+    const saved = JSON.parse(localStorage.getItem("finalTownGame"));
+    if (!saved) return;
+    state.stars = saved.stars || 0;
+    state.mistakes = saved.mistakes || [];
+    state.progress = saved.progress || {};
+  } catch {
+    localStorage.removeItem("finalTownGame");
+  }
+}
+
+function shuffle(items) {
+  return items
+    .map((value) => ({ value, sort: Math.random() }))
+    .sort((a, b) => a.sort - b.sort)
+    .map((item) => item.value);
+}
+
+function visualHTML(code) {
+  const [type, raw] = code.split(":");
+  if (type === "coins") return repeatScene(Number(raw), "coin", "$");
+  if (type === "cubes") return repeatScene(Number(raw), "cube", "");
+  if (type === "snacks") return repeatScene(Number(raw), "snack", "");
+  if (type === "ruler") {
+    const count = Number(raw);
+    return `<div class="scene"><div class="ruler">${Array.from({ length: count }, (_, index) => `<span class="ruler-block">${index + 1}</span>`).join("")}</div></div>`;
+  }
+  if (type === "pizza") {
+    const [top, bottom] = raw.split("/").map(Number);
+    return `<div class="scene"><div class="pizza">${Array.from({ length: bottom }, (_, index) => `<span class="pizza-piece" style="opacity:${index < top ? 1 : 0.28}">${index < top ? "" : ""}</span>`).join("")}</div></div>`;
+  }
+  return `<div class="scene"></div>`;
+}
+
+function repeatScene(count, className, label) {
+  return `<div class="scene">${Array.from({ length: count }, () => `<span class="${className}">${label}</span>`).join("")}</div>`;
+}
+
+</script>
+  </body>
+</html>
